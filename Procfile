@@ -1,1 +1,1 @@
-web: gunicorn autobetting.autobetting.wsgi --log-file -
+web: cd autobetting; gunicorn autobetting.wsgi --log-file -
