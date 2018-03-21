@@ -1,0 +1,1 @@
+web: gunicorn autobetting.autobetting.wsgi --log-file -
