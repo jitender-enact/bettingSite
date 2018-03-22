@@ -42,24 +42,34 @@ class ScrapeProcess:
     def __init__(self, site_pages):
 
         """ Create Scrapy Object and set 'site_pages' and current_page """
-        self.SITE_PAGES = site_pages
+
+        self.setSitePages(site_pages)  # set SITE_PAGES
         self.scrapy = self.createScrapyObject()  # create Scarpy Object
         self.current_page = 1
         self.method = 'get'
 
+    def setSitePages(self, site_pages):
+
+        """ Set the SITE_PAGES values """
+
+        self.SITE_PAGES = site_pages
+
     def nextPage(self):
 
         """ Increment the current_page value by 1 and update current_page value."""
+
         self.current_page += 1
 
     def createScrapyObject(self):
 
         """ Create and Return the Scrapy Object"""
+
         return Scrapy()
 
     def configureScrapyObject(self, obj):
 
         """ Configured the Scrapy objects by given 'site_pages' value."""
+
         if ('url' in obj) and obj["url"] and ('method' in obj) and (obj["method"].lower() in ["get", "post"]):
             self.scrapy.setUrl(obj["url"])
 
@@ -72,6 +82,7 @@ class ScrapeProcess:
     def getPage(self, updateUserAgent=False):
 
         """ Return the current page response. """
+
         page = "page_{}".format(self.current_page)
         obj = self.SITE_PAGES[page]
         self.configureScrapyObject(obj)
