@@ -74,8 +74,10 @@ class ScrapeProcess:
             self.scrapy.setUrl(obj["url"])
 
             self.method = obj["method"].lower()
+
             if ("set_headers" in obj) and obj['set_headers']:
                 self.scrapy.setHeaders(**obj['set_headers'])
+
             if ("update_headers" in obj) and obj['update_headers']:
                 self.scrapy.setHeaders(**obj['update_headers'])
 
@@ -87,9 +89,9 @@ class ScrapeProcess:
         obj = self.SITE_PAGES[page]
         self.configureScrapyObject(obj)
 
-        if (self.method == 'get'):
+        if self.method == 'get':
             return self.scrapy.getRequest(updateUserAgent)
 
-        elif (self.method == 'post'):
+        elif self.method == 'post':
             if ("post_data" in obj) and obj['post_data']:
                 return self.scrapy.postRequest(data=obj['post_data'], updateUserAgent=updateUserAgent)
