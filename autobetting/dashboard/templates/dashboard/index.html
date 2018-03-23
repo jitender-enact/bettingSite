@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block css_header %}
-  {{ block.super }}
+    {{ block.super }}
     <link rel="stylesheet" href="{% static 'css/bootstrap-switch.css' %}">
     <link rel="stylesheet" href="{% static 'css/font-awesome.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -10,398 +10,42 @@
 
 
 {% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
 {% endif %}
 
- {% block body_block %}
-
-     <div class="container-fluid">
-     {% if messages %}
+{% block body_block %}
+    {% include 'users/layout/header.html' %}
+    <div class="container">
+        {% if messages %}
             {% for message in messages %}
                 <p class="bg-success ele-font-size text-center text-success element-pedding {% if message.tags %} {{ message.tags }} {% endif %}">
                     {{ message }}
                 </p>
             {% endfor %}
         {% endif %}
-         <div class="row">
-            <div class="col-sm-3 col-md-2 sidebar">
-               <div class="text-center logo-left">
-                  <img src="{% static 'img/logo-dashboard.png' %}" alt="logo">
-               </div>
-               <ul class="nav nav-sidebar">
-                  <li>
-                     <a href="#">
-                     <i class="fa fa-tachometer fa-2"></i>
-                     <span class="nav-text"> Dashboard </span>
-                     </a>
-                  </li>
-                  <li>
-                     <a href="#">
-                     <i class="fa fa-plus-circle"></i>
-                     <span class="nav-text"> Add Post</span>
-                     </a>
-                  </li>
-                  <li>
-                     <a href="#">
-                     <i class="fa fa-user"></i>
-                     <span class="nav-text"> Users</span>
-                     </a>
-                  </li>
-                   <li>
-                     <a href="#">
-                     <i class="fa fa-user"></i>
-                     <span class="nav-text"> Manage Role</span>
-                     </a>
-                  </li>
-                  <li>
-                     <a href="#">
-                     <i class="fa fa-archive"></i>
-                     <span class="nav-text">Storage</span>
-                     </a>
-                  </li>
-                  <li>
-                     <a href="#">
-                     <i class="fa fa-tachometer fa-2"></i>
-                     <span class="nav-text"> Statistics</span>
-                     </a>
-                  </li>
-                  <li>
-                     <a href="#">
-                     <i class="fa fa-cog"></i>
-                     <span class="nav-text">Settings</span>
-                     </a>
-                  </li>
-                   <li>
-                     <a href="{% url 'users:logout' %}">
-                     <i class="fa fa-sign-out"></i>
-                     <span class="nav-text">Logout</span>
-                     </a>
-                  </li>
-               </ul>
+        <div class="wrap">
+
+            <div class="container">
+                <div class="site-index">
+                    <div class="Wrapper">
+                        <h4>Welcome to Auto Bettor</h4>
+                        <p>To bet Click on the <a href="http://enacteservices.com/bettingSite/frontend/web/bet">link</a>
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-               <div class="heading clearfix col-xs-12">
-                  <div class="pull-left title">Users</div>
-                  <div class="pull-right right-search ">
-                     <span class="glyphicon glyphicon-search search-btn"></span>
-                     <input class="search" style="display:none" type="text" value="" placeholder="Search User" id="search" name="q">
-                     <div class="add-user pull-right" data-toggle="modal" data-target="#user-model"></div>
-                  </div>
-               </div>
-               <div class="row">
-                  <div class="right-bar col-xs-12 text-center">
-                     <div class="col-xs-12 col-lg-4 col-sm-4">
-                        <span class="statstics"> 23,543</span>
-                        <p>user</p>
-                     </div>
-                     <div class="col-xs-12 col-lg-4 col-sm-4">
-                        <span class="statstics">5843</span>
-                        <p> per day vistors</p>
-                     </div>
-                     <div class="col-xs-12 col-lg-4 col-sm-4">
-                        <span class="statstics">14,452</span>
-                        <p>active users</p>
-                     </div>
-                  </div>
-               </div>
-               <div class="user-panel col-lg-12">
-                  <div class="user-image col-lg-1 col-sm-2">
-                     <img src="{% static 'img/user3.png' %}" alt="user">
-                  </div>
-                  <div class="user-image col-lg-4 col-sm-4">
-                     <div class="user-name">James R. Barge</div>
-                     <div class="user-email">james@yopmail.com</div>
-                     <div class="user-phone">+1 735 274 7352</div>
-                  </div>
-                  <div class="user-activity col-lg-4">
-                     <div>Last Activity: 12 jan,2015</div>
-                     <div>User:2 per week</div>
-                     <div>Post:10 per week </div>
-                  </div>
-                  <div class="user-activity col-lg-3">
-                    <input type="checkbox" name="my-checkbox" data-off-text="Off" data-on-text="On"  checked>
-                     <ul class="social-links pull-right">
-
-                        <li>
-                           <a  class="edit-user" href="javascript:void(0)" data-toggle="modal" data-target="#edit-model">
-                           Edit
-                           </a>
-                        </li>
-                        <li>
-                           <a class="delete-user" href="javascript:void(0)">
-                       Delete
-                           </a>
-                        </li>
-                     </ul>
-                  </div>
-               </div>
-               <div class="user-panel col-lg-12">
-                  <div class="user-image col-lg-1 col-sm-2">
-                     <img src="{% static 'img/user1.png' %}" alt="user">
-                  </div>
-                  <div class="user-image col-lg-4 col-sm-4">
-                     <div class="user-name">Connie S.Salter</div>
-                     <div class="user-email">james@yopmail.com</div>
-                     <div class="user-phone">+1 735 274 7352</div>
-                  </div>
-                  <div class="user-activity col-lg-4">
-                     <div>Last Activity: 12 jan,2015</div>
-                     <div>User:2 per week</div>
-                     <div>Post:10 per week </div>
-                  </div>
-                  <div class="user-activity col-lg-3">
-                  <input type="checkbox" name="my-checkbox" data-off-text="Off" data-on-text="On"  checked>
-                     <ul class="social-links pull-right">
-
-                        <li>
-                           <a class="edit-user" href="javascript:void(0)" data-toggle="modal" data-target="#edit-model">
-                           Edit
-                           </a>
-                        </li>
-                        <li>
-                           <a class="delete-user" href="javascript:void(0)">
-                       Delete
-                           </a>
-                        </li>
-                     </ul>
-
-                  </div>
-               </div>
-               <div class="user-panel col-lg-12">
-                  <div class="user-image col-lg-1 col-sm-2">
-                     <img src="{% static 'img/user3.png' %}" alt="user">
-                  </div>
-                  <div class="user-image col-lg-4 col-sm-4">
-                     <div class="user-name">Walter</div>
-                     <div class="user-email">james@yopmail.com</div>
-                     <div class="user-phone">+1 735 274 7352</div>
-                  </div>
-                  <div class="user-activity col-lg-4">
-                     <div>Last Activity: 12 jan,2015</div>
-                     <div>User:2 per week</div>
-                     <div>Post:10 per week </div>
-                  </div>
-                  <div class="user-activity col-lg-3">
-                   <input type="checkbox" name="my-checkbox" data-off-text="Off" data-on-text="On"  checked>
-                     <ul class="social-links pull-right">
-
-                        <li>
-                           <a class="edit-user" href="javascript:void(0)" data-toggle="modal" data-target="#edit-model">
-                           Edit
-                           </a>
-                        </li>
-                        <li>
-                           <a class="delete-user" href="javascript:void(0)">
-                       Delete
-                           </a>
-                        </li>
-                     </ul>
-
-                  </div>
-               </div>
-               <div class="user-panel col-lg-12">
-                  <div class="user-image col-lg-1 col-sm-2">
-                     <img src="{% static 'img/user5.png' %}" alt="user">
-                  </div>
-                  <div class="user-image col-lg-4 col-sm-4">
-                     <div class="user-name">James R. Barge</div>
-                     <div class="user-email">james@yopmail.com</div>
-                     <div class="user-phone">+1 735 274 7352</div>
-                  </div>
-                  <div class="user-activity col-lg-4">
-                     <div>Last Activity: 12 jan,2015</div>
-                     <div>User:2 per week</div>
-                     <div>Post:10 per week </div>
-                  </div>
-                  <div class="user-activity col-lg-3">
-                  <input type="checkbox" name="my-checkbox" data-off-text="Off" data-on-text="On"  checked>
-                     <ul class="social-links pull-right">
-
-                        <li>
-                           <a class="edit-user" href="javascript:void(0)" data-toggle="modal" data-target="#edit-model">
-                           Edit
-                           </a>
-                        </li>
-                        <li>
-                           <a class="delete-user" href="javascript:void(0)">
-                       Delete
-                           </a>
-                        </li>
-                     </ul>
-
-                  </div>
-               </div>
-               <div class="user-panel col-lg-12">
-                  <div class="user-image col-lg-1 col-sm-2">
-                     <img src="{% static 'img/user5.png' %}" alt="user">
-                  </div>
-                  <div class="user-image col-lg-4 col-sm-4">
-                     <div class="user-name">Joe walter</div>
-                     <div class="user-email">james@yopmail.com</div>
-                     <div class="user-phone">+1 735 274 7352</div>
-                  </div>
-                  <div class="user-activity col-lg-4">
-                     <div>Last Activity: 12 jan,2015</div>
-                     <div>User:2 per week</div>
-                     <div>Post:10 per week </div>
-                  </div>
-                  <div class="user-activity col-lg-3">
-                   <input type="checkbox" name="my-checkbox" data-off-text="off" data-on-text="On"  checked>
-                     <ul class="social-links pull-right">
-
-                        <li>
-                           <a class="edit-user" href="javascript:void(0)" data-toggle="modal" data-target="#edit-model">
-                           Edit
-                           </a>
-                        </li>
-                        <li>
-                           <a class="delete-user" href="javascript:void(0)">
-                       Delete
-                           </a>
-                        </li>
-                     </ul>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </div>
-      <div class="modal fade sm" id="user-model" >
-         <div class="modal-dialog user-model">
-            <div class="modal-content">
-               <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <h4 class="modal-title">Add User</h4>
-               </div>
-               <div class="modal-body">
-                  <form class="form-horizontal">
-                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Name</label>
-                        <div class="col-sm-9">
-                           <input type="text" class="form-control" placeholder="Jane">
-                        </div>
-                     </div>
-                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Last Name</label>
-                        <div class="col-sm-9">
-                           <input type="text" class="form-control" placeholder="Doe">
-                        </div>
-                     </div>
-                     <div class="form-group">
-                        <label  class="col-sm-3 control-label">Profile Picture</label>
-                        <div class="col-sm-9">
-                           <input type="file"  id="User" required="required">
-                        </div>
-                     </div>
-                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Email</label>
-                        <div class="col-sm-9">
-                           <input type="text" class="form-control" placeholder="doe@yopmail.com">
-                        </div>
-                     </div>
-                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Phone No</label>
-                        <div class="col-sm-9">
-                           <input type="text" class="form-control" placeholder="91 2345 3456">
-                        </div>
-                     </div>
-
-                  </form>
-               </div>
-               <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary">Save</button>
-               </div>
-            </div>
-            <!-- /.modal-content -->
-         </div>
-         <!-- /.modal-dialog -->
-      </div>
-      <!-- /.modal -->
-
-        <div class="modal fade sm" id="edit-model" >
-         <div class="modal-dialog user-model">
-            <div class="modal-content">
-               <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <h4 class="modal-title">Edit User</h4>
-               </div>
-               <div class="modal-body">
-                  <form class="form-horizontal">
-                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Name</label>
-                        <div class="col-sm-9">
-                           <input type="text" class="form-control" id="exampleInputName3" placeholder="Jane">
-                        </div>
-                     </div>
-                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Last Name</label>
-                        <div class="col-sm-9">
-                           <input type="text" class="form-control" id="exampleInputName5" placeholder="Doe">
-                        </div>
-                     </div>
-                     <div class="form-group">
-                        <label  class="col-sm-3 control-label">Profile Picture</label>
-                        <div class="col-sm-9">
-                           <input type="file" id="UserProfile" required="required">
-                        </div>
-                     </div>
-                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Email</label>
-                        <div class="col-sm-9">
-                           <input type="text" class="form-control" id="exampleInputName7" placeholder="doe@yopmail.com">
-                        </div>
-                     </div>
-                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Phone No</label>
-                        <div class="col-sm-9">
-                           <input type="text" class="form-control" id="exampleInputName2" placeholder="91 2345 3456">
-                        </div>
-                     </div>
-                      <div class="form-group">
-                         <label class="col-sm-3 control-label">Role</label>
-                           <div class="col-sm-9">
-                                <select id="language-multi" multiple="multiple">
-                                        <option value="Admin" >Admin</option>
-                                        <option value="Read Only">Read Only</option>
-
-                                 </select>
-                             </div>
-                      </div>
-                  </form>
-               </div>
-               <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary">Save</button>
-               </div>
-            </div>
-            <!-- /.modal-content -->
-         </div>
-         <!-- /.modal-dialog -->
         </div>
-        <!-- /.modal -->
-         <!-- Bootstrap core JavaScript
-         ================================================== -->
-      <!-- Placed at the end of the document so the pages load faster -->
-
- {% endblock %}
+    </div>
+    {% include 'users/layout/footer.html' %}
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+{% endblock %}
 
 {% block js_footer %}
     {{ block.super }}
-    <script src="{% static 'js/bootstrap-switch.js' %}"></script>
-    <script src="{% static 'js/bootstrap-multiselect.js' %}"></script>
-
-    <script>
-         var flip = 0;
-         $( ".search-btn" ).click(function() {
-         $( ".search" ).toggle();
-         });
-
-         $("[name='my-checkbox']").bootstrapSwitch();
-           $('#language-multi').multiselect();
-
-      </script>
 {% endblock %}
