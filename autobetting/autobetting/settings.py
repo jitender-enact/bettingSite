@@ -126,7 +126,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
-
+USER_EMAIL = "noreply@autobetting.com"
 
 import django_heroku
 django_heroku.settings(locals())
