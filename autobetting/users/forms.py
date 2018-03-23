@@ -32,6 +32,7 @@ class UserAuthenticationForm(WidgetAttributesMixin, AuthenticationForm):
 
         self.update_the_widget_attr('username', {
             'class': 'form-control',
+            'autofocus': False,
             'placeholder': 'Username',
         })
 
