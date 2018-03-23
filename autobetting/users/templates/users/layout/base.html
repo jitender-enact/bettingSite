@@ -1,0 +1,46 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en-US" xmlns="http://www.w3.org/1999/html">
+   <head>
+      <!-- ==============================================
+      Title and Meta Tags
+      =============================================== -->
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+      <meta charset="utf-8">
+      <title>{% block page_title %}Basic Project{% endblock %}</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="keywords" content="HTML, CSS, XML, XHTML, JavaScript">
+      <meta name="description" content="">
+      <meta name="author" content="">
+
+         <!-- ==============================================
+         CSS
+         =============================================== -->
+
+       {% block css_header %}
+           <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+       {% endblock %}
+   </head>
+
+   <body class="main-bg">
+
+        <!-- ==============================================
+        Main Body
+        =============================================== -->
+      {% block body_block %}
+      {% endblock %}
+
+      <!-- ==============================================
+      Java-scripts
+      =============================================== -->
+
+
+          {% block js_footer %}
+                  <script src="{% static 'js/jquery.min.js' %}"></script>
+                  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+          {% endblock %}
+   </body>
+</html>
+

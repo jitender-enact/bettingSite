@@ -1,0 +1,426 @@
+/*--------------------
+-----Main Styles------
+----------------------*/
+
+html, 
+body {
+    font-family: "Open Sans",sans-serif;
+    height: 100%;
+    min-height: 100%;
+}
+
+.main-bg {
+    background-color: #7c5981;
+}
+
+a:hover {
+    color: #4a354d;
+}
+
+/*--------------------
+-----Login Page-----
+----------------------*/
+
+.main-center {
+    border: 1px solid #fff;
+    background-color: #fff;
+    border-radius: 6px;
+}
+
+.col-centered {
+    float: none;
+    margin: 0 auto;
+}
+
+.main-wraper {
+    display: table-row-group;
+
+}
+
+#login-bg .top-center {
+    margin-top: 10%;
+}
+
+.text-center img {
+    margin-top: 5%;
+}
+
+.login-form {
+    margin-top: 5%;
+}
+
+.login-form input {
+    height: 58px;
+    color: #CDC1CF;
+    font-size: 18px;
+    background: #f8f9fb;
+    border: 1px solid #969696;
+}
+
+.login-form .form-group {
+    margin-bottom: 20px;
+}
+
+.forget-pass {
+    color: #7c5981;
+    float: left;
+    font-size: 20px;
+    margin-top: 17px;
+}
+
+.custom-login-btn {
+    background-color: #7c5981;
+    font-size: 20px;
+    height: 59px;
+    width: 155px;
+} 
+
+.custom-login-btn:hover,
+.custom-login-btn:focus,
+.custom-login-btn:active {
+    background-color: #634767!important;
+}
+
+.no-padding {
+    padding: 1px 10px;
+}
+
+.border-bottom {
+    border-top: 1px solid #cccccc;
+    margin-top: 6% !important;
+    margin-bottom: 7% !important;
+}
+
+.border-bottom > span {
+    display: inline-block;
+    font-size: 20px;
+    margin-top: 6%;
+    color: #818181;
+}
+
+.form-control::-moz-placeholder,
+.form-control:-ms-input-placeholder,
+.form-control::-webkit-input-placeholder{
+    color: #cdc1cf;
+    opacity: 1;
+}
+
+.signup-login {
+    color: #B138C2;
+    text-decoration: underline;
+}
+
+.forget-pass a {
+    color: #7c5981;
+}
+
+.site-wrapper-inner {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.site-wrapper {
+    display: table;
+    height: 100%;
+    min-height: 100%;
+    width: 100%;
+}
+
+
+/*--------------------
+-----Sign up-----
+----------------------*/
+.col-center {
+    float: none;
+    margin: auto;
+}
+
+.sign-up-text {
+    color: #7c5981;
+    display: inline-block;
+    font-size: 15px;
+    line-height: 2.1;
+    margin-top: 17px;
+}
+
+.sign-up-title {
+    color: #707070;
+    font-size: 39px;
+    font-weight: 300;
+ 
+}
+
+.sign-up-bottom {
+	color: #3b3b3b;
+	font-size: 16px;
+}
+
+.border-bottom span {
+    display: inline-block;
+    margin-top: 6%;
+    color: #818181;
+}
+
+.left-signup-section {
+    padding: 6%;
+}
+
+.left-signup-section {
+  
+    padding: 10% 5% 7%;
+}
+
+.custom-login-btn {
+    width:100%!important;
+}
+
+.bottom-text {
+	font-size: 22px;
+}
+
+.fix-width .well {
+	padding: 3px;
+}
+
+.sign-up-right {
+    padding: 40px;
+}
+
+
+/*--------------------
+-----forget-password-----
+----------------------*/
+
+.forget-title {
+    color: #7c5981;
+    font-size: 23px;
+    padding: 13px 0 3px;
+}
+
+.forget-text {
+    color: #9b9b9b;
+    font-size: 16px;
+    margin-bottom: 40px;
+}
+
+.back-login {
+	color: #7c5981;
+	text-decoration: underline;
+	font-size: 22px;
+}
+
+/*--------------------
+-----reset-password-----
+----------------------*/
+
+.reset-password {
+    margin-bottom: 30px;
+}
+
+
+/*--------------------
+-----Home Page-----
+----------------------*/
+
+.top-section {
+	background:   url('../images/login-Recovered.png') no-repeat top center;
+	background-origin: content-box;
+    background-size: 100% auto;
+	width: 100%;
+	height: 100%;
+	margin-bottom: 0;
+	padding:0;
+	position: relative;
+    background-size: cover;
+}
+
+.triangle {
+	position: absolute;
+	bottom: 0px;
+	width: 100%
+}
+
+.triangle-bottom {
+    position: absolute;
+    width: 100%;
+}
+
+.navar-custom {
+	background-color: transparent;
+	border:none;
+    margin-top: 25px;
+}
+
+.navar-custom .navbar-nav >li > a {
+    color:#fff;
+    font-size: 16px;
+    padding: 11px;
+}
+
+.navbar-default .navbar-nav > li > a:focus,
+.navbar-default .navbar-nav > li > a:hover {
+    color: #e7e7e7;
+}
+
+.home-main-title {
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 300;
+}
+
+.home-text {
+    color: #ffffff;
+    margin-top: 7%;
+}
+
+.home-learn-button {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    border: 2px solid #cccccc;
+    border-radius: 19px;
+    font-size: 19px;
+    padding: 11px 53px;
+    margin-top: 7%;
+    color: #fff;
+}
+
+.main-heading {
+    margin-top: 14%;
+
+}
+
+.right-section {
+    background-image:url('../images/itimage.jpg');
+    height: 350px;
+}
+
+.center-heading {
+    font-size: 36px;
+    margin-bottom: 8%;
+    color: #7c5981;
+    font-weight: 600;
+}
+
+.left-section {
+    font-size: 14px;
+    line-height: 34px;
+    margin-top: 7%;
+}
+
+.margin-center {
+    margin-top: 7%;
+    margin-bottom: 11%;
+}
+
+.right-text {
+    color: #808080;
+    font-size: 16px;
+    margin-left: 50px;
+}
+
+ .left-section p {
+    color: #808080;
+    font-size: 16px;
+}
+
+.full-width-bg {
+    background: #7c5981 none repeat scroll 0 0;
+    margin-top: 10.4%;
+    width: 100%;
+}
+
+.text-bootom {
+    color: #000000;
+    font-size: 25px;
+    line-height: 2;
+    margin-bottom: 10%;
+    margin-top: 7%;
+    text-align: center;
+}
+
+.full-width-footer {
+    background: #322234 none repeat scroll 0 0;
+    width: 100%;
+}
+
+.fb {
+    background-image: url("../images/fb.png");
+}
+
+.twiter {
+    background-image: url("../images/twitter.png");
+}
+
+.google {
+    background-image: url("../images/google.png");
+    
+}
+
+.fb,
+.twiter,
+.google {
+    display: inline-block;
+    height: 75px;
+    width: 75px;
+}
+ 
+.social-links {
+    list-style: outside none none;
+    margin: 40px 0 20px;
+    padding: 0;
+}
+
+.social-links li {
+    display: inline-block;
+    margin: 0 10px;
+}
+
+.full-width-footer a {
+    color: #cecece;
+}
+
+.footer-nav {
+    margin-top: 10px;
+    display: inline-block;
+
+}
+
+.sign-up-home a:hover {
+    color: #6b495a !important;
+}
+
+.copright-text {
+    border-top: 1px solid #c3c3c3;
+    color: #767676;
+    margin: 8px auto;
+    padding: 17px 0;
+    width: 47%;
+    font-size: 12px;
+}
+
+.sign-up-home {
+    background: #Fff ;
+    border-radius: 4px;
+    padding: 0;
+}
+
+.sign-up-home a {
+    color: #86688b !important;
+    font-weight: 600;
+}
+
+.navar-custom li {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.navar-custom .navbar-header {
+    margin-right: 29px;
+}
+
+.element-pedding {
+    padding: 10px;
+}
+
+.ele-font-size {
+    font-size: 16px;
+}

@@ -1,0 +1,163 @@
+@media (max-width: 480px) {
+
+    .custom-btn-block {
+        width: 100%;
+    }
+
+    .forget-pass {
+        margin-bottom: 14px;
+        margin-top: -6px;
+    }
+
+    .border-bottom.col-sm-6.col-centered.text-center > span {
+        font-size: 20px;
+    }
+
+    .sign-up-right {
+        padding: 15px;
+    }
+
+    .border-bottom > span {
+        font-size: 18px;
+    }
+
+    .navar-custom .navbar-header {
+        margin-right: -26px !important;
+    }
+
+    .sign-up-home a {
+        text-align: center;
+    }
+
+    .triangle {
+        display: none;
+    }
+
+    .top-section {
+        height: auto;
+    }
+
+    .home-learn-button {
+        margin-bottom: 28px;
+    }
+
+    .home-main-title {
+        font-size: 22px;
+    }
+
+    .center-heading {
+        font-size: 20px;
+        margin-top: 32px;
+    }
+
+    .right-text {
+        margin-left: 0;
+    }
+
+    .text-bootom {
+        font-size: 19px;
+        text-align: left;
+    }
+
+    .navbar-default .navbar-collapse,
+    .navbar-default .navbar-form {
+        background: rgba(0, 0, 0, 0.4) none repeat scroll 0 0;
+        border-color: #e7e7e7;
+    }
+
+    .fb,
+    .twiter,
+    .google {
+        background-size: 100% auto;
+        height: 50px;
+        width: 50px;
+    }
+}
+
+@media (min-width: 768px) {
+    .forget-pass {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 640px) and (min-width: 640px) {
+    .right-text {
+        margin-left: 0;
+    }
+
+    .home-learn-button {
+        margin-bottom: 10%;
+    }
+
+    .center-heading {
+        margin-bottom: 2%;
+        margin-top: 15px;
+    }
+
+    .triangle {
+        display: none;
+    }
+
+    .top-section {
+        height: auto;
+    }
+
+    .navar-custom .navbar-header,
+    .navbar-toggle {
+
+    	margin-right: 0 !important;
+    }
+
+    .navbar-default .navbar-collapse,
+    .navbar-default .navbar-form {
+        background: rgba(0, 0, 0, 0.4) none repeat scroll 0 0;
+        border-color: #e7e7e7;
+    }
+
+}
+
+@media (max-width: 768px) and (min-width: 768px) {
+    .right-text {
+        margin-left: 0;
+    }
+
+    .home-learn-button {
+        margin-bottom: 10%;
+    }
+
+    .center-heading {
+        margin-bottom: 2%;
+        margin-top: 15px;
+    }
+
+    .triangle {
+        display: none;
+    }
+
+    .top-section {
+        height: auto;
+    }
+}
+
+@media (max-width: 800px) and (min-width: 800px) {
+    .right-text {
+        margin-left: 0;
+    }
+
+    .home-learn-button {
+        margin-bottom: 10%;
+    }
+
+    .center-heading {
+        margin-bottom: 2%;
+        margin-top: 15px;
+    }
+
+    .triangle {
+        display: none;
+    }
+    
+    .top-section {
+        height: auto;
+    }
+}

@@ -1,0 +1,96 @@
+{% extends 'users/layout/form-layout.html' %}
+{% load staticfiles %}
+
+{% block css_header %}
+    {{ block.super }}
+{#        <link rel="stylesheet" href="{% static 'css/style.css' %}">#}
+{% endblock %}
+
+{% block body_block %}
+    <div class="site-wrapper">
+        {% if messages %}
+            {% for message in messages %}
+                <p class="bg-success ele-font-size text-center text-success element-pedding {% if message.tags %} {{ message.tags }} {% endif %}">
+                    {{ message }}
+                </p>
+            {% endfor %}
+        {% endif %}
+        <div class="main-wraper">
+            <div class="site-wrapper-inner">
+                <div class="col-xs-12 ">
+                    <div class=" col-sm-12 col-md-10 col-lg-7 main-center col-center">
+
+                        <div class="text-center">
+                            {% block form_header %}
+                                <img src="{% static 'img/logo.png' %}"
+                                     alt="logo">
+                            {% endblock %}
+
+                        </div>
+                        {% block main_form %}
+                            <form class="form-horizontal login-form"
+                                  method="post"
+                                  action="{% url 'users:login' %}"
+                                  data-toggle="validator">
+                                {% csrf_token %}
+                                {% if form.non_field_errors %}
+                                    <p class="bg-danger ele-font-size text-center text-danger element-pedding">{{ form.non_field_errors.as_text }}</p>
+                                {% endif %}
+                                <div class="form-group ">
+                                    <div class="col-sm-6  col-centered">
+                                        {{ form.username }}
+                                        {% if form.username.errors %}
+                                            <div class="help-block with-errors">{{ form.username.errors.as_text }}</div>
+                                            {% else %}
+                                            <div class="help-block with-errors"></div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-6  col-centered">
+                                        {{ form.password }}
+                                        {% if form.password.errors %}
+                                            <div class="help-block with-errors">{{ form.password.errors.as_text }}</div>
+                                            {% else %}
+                                            <div class="help-block with-errors"></div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-xs-12  col-sm-6 col-centered clearfix">
+                                        <div class="row">
+                                            <div class='forget-pass col-xs-12 col-sm-6'>
+                                                <a href="{% url 'users:forgot_password' %}">
+                                                    Forget Password?
+                                                </a>
+                                            </div>
+                                            <div class='col-xs-12 col-sm-6 text-right'>
+                                                <button type="submit"
+                                                        class="btn btn-primary custom-login-btn btn-lg custom-btn-block">
+                                                    LOG IN
+                                                </button>
+                                                <input type="hidden"
+                                                       name="next"
+                                                       value="{{ next }}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="border-bottom col-sm-6  col-centered text-center">
+                                   <span class="bottom-text text-center">
+                                      Dont't have an account?
+                                      <a class="signup-login"
+                                         href="{% url 'users:sign_up' %}">
+                                          Sign up
+                                      </a>
+                                   </span>
+                                </div>
+                            </form>
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

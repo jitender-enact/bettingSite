@@ -1,0 +1,67 @@
+{% extends 'users/layout/extend_base.html' %}
+{% load staticfiles %}
+
+{% block css_header %}
+    {{ block.super }}
+{#    <link rel="stylesheet" href="{% static 'css/style.css' %}">#}
+{% endblock %}
+
+{% block body_block %}
+     <div class="site-wrapper">
+     {% if messages %}
+            {% for message in messages %}
+                <p class="bg-success ele-font-size text-center text-success element-pedding {% if message.tags %} {{ message.tags }} {% endif %}">
+                    {{ message }}
+                </p>
+            {% endfor %}
+        {% endif %}
+         <div class="main-wraper">
+            <div class="site-wrapper-inner">
+               <div class="col-xs-12 col-lg-5 col-sm-12  col-center">
+                  <div class="well well-default clearfix ">
+                     <div class="text-center">
+                         {% block form_header %}
+                        <img src="{% static 'img/logo.png' %}" alt="logo">
+{#                        <div class="forget-title">#}
+{#                           Forget your password?#}
+{#                        </div>#}
+{#                        <div class="forget-text">Dont't worry! Just fill in your email and we'll help you reset your password.</div>#}
+                             {% endblock %}
+                     </div>
+                        {% block main_form %}
+                     <form class="form-horizontal login-form col-center" action="{% url 'users:reset_form' %}" method="post">
+                         {% csrf_token %}
+                        <div class="form-group ">
+                           <div class="col-lg-7 col-xs-12 col-sm-7 col-center ">
+                               {{ form.email }}
+                               {{ form.email.errors }}
+{#                              <input type="email" class="form-control" id="inputEmail3" placeholder="Email">#}
+                           </div>
+                        </div>
+                        <div class="form-group ">
+                           <div class="col-lg-7 col-xs-12 col-sm-7  col-center ">
+                              <button type="submit" class="btn btn-primary custom-login-btn btn-lg custom-btn-block">SEND EMAIL</button>
+                           </div>
+                        </div>
+                        <div class="border-bottom border-forget col-lg-7 col-sm-7 col-xs-12  text-center col-center">
+                           <span class="bottom-text text-center">
+                              <a class="back-login" href="#">
+                                 Back to log in
+                              </a>
+                           </span>
+                        </div>
+                     </form>
+                            {% endblock %}
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+{% endblock %}
+
+{% block js_footer %}
+    {{ block.super }}
+    <script src="{% static 'js/validator.min.js' %}"></script>
+{% endblock %}
+
+
