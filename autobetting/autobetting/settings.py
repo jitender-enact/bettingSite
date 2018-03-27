@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
-    'dashboard.apps.DashboardConfig'
+    'dashboard.apps.DashboardConfig',
+    'bet.apps.BetConfig',
 ]
 
 MIDDLEWARE = [
