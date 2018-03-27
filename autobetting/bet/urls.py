@@ -1,0 +1,14 @@
+from django.urls import path, re_path
+from bet import views
+
+urlpatterns = [
+    path('',
+         views.CreateBetView.as_view(),
+         name="create_bet_page"),
+    path('my-bets/',
+         views.ListBetView.as_view(),
+         name="list_bet_page"),
+    path('bet-status/<int:bet_id>/',
+         views.ListBetStatusView.as_view(),
+         name="list_bet_status_page"),
+]

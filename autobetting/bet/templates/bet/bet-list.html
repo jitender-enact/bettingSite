@@ -1,0 +1,107 @@
+{% extends "users/layout/base.html" %}
+{% load staticfiles %}
+{% load custom_tags %}
+
+{% block css_header %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/bootstrap-switch.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% block body_block %}
+    {% include 'users/layout/header.html' %}
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <p class="bg-success ele-font-size text-center text-success element-pedding {% if message.tags %} {{ message.tags }} {% endif %}">
+                    {{ message }}
+                </p>
+            {% endfor %}
+        {% endif %}
+        <div class="site-index">
+            <div class="Wrapper">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_name' %}-game_name{% else %}game_name{% endifequal %}">Game Name</a>
+                        </th>
+                        <th>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_type' %}-game_type{% else %}game_type{% endifequal %}">Game</a>
+                        </th>
+                        <th>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_interval' %}-game_interval{% else %}game_interval{% endifequal %}">Interval Name</a>
+                        </th>
+                        <th>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_team' %}-game_team{% else %}game_team{% endifequal %}">Game Team</a>
+                        </th>
+                        <th>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'rotation' %}-rotation{% else %}rotation{% endifequal %}">Rotation</a>
+                        </th>
+                        <th>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'bid_date' %}-bid_date{% else %}bid_date{% endifequal %}">Date</a>
+                        </th>
+                        <th>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'selected_line' %}-selected_line{% else %}selected_line{% endifequal %}">Selected Line</a>
+                        </th>
+                        <th>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'incoming_line' %}-incoming_line{% else %}incoming_line{% endifequal %}">Incoming Line</a>
+                        </th>
+                        <th>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'incoming_juice' %}-incoming_juice{% else %}incoming_juice{% endifequal %}">Incoming Juice</a>
+                        </th>
+                        <th>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'amount' %}-amount{% else %}amount{% endifequal %}">Amount</a>
+                        </th>
+                        <th class="action-column">&nbsp;</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% ifequal request.GET.game_name "name" %}
+                        {{ request.GET.game_name }}
+                    {% endifequal %}
+                    {% for obj in object_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ obj.game_name }}</td>
+                            <td>{{ obj.game_type|get_game_type }}</td>
+                            <td>{{ obj.game_interval|get_game_interval }}</td>
+                            <td>{{ obj.game_team }}</td>
+                            <td>{{ obj.rotation }}</td>
+                            <td>{{ obj.bid_date }}</td>
+                            <td>{{ obj.selected_line|get_selected_line }}</td>
+                            <td>{{ obj.incoming_line }}</td>
+                            <td>{{ obj.incoming_juice }}</td>
+                            <td>${{ obj.amount }}</td>
+                            <td><a href="{% url 'bet:list_bet_status_page' obj.id %}">View</a></td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="12"> No Bets Found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% include 'users/layout/footer.html' %}
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+{% endblock %}
+
+{% block js_footer %}
+    {{ block.super }}
+{% endblock %}
