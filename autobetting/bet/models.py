@@ -34,6 +34,11 @@ SELECTED_LINES = (
     (4, 'TEAM TOTAL')
 )
 
+BET_ERROR_STATUS = (
+    (1, 'initialize'),
+    (2, 'success'),
+    (3, 'error')
+)
 
 class Sites(models.Model):
     site_name = models.CharField(max_length=255, null=True, blank=True, verbose_name="Name of the site")
@@ -77,3 +82,16 @@ class UserBets(models.Model):
 
     def __str__(self):
         return 'Bet by user: {}'.format(self.user.username)
+
+
+class BetErrors(models.Model):
+    bet = models.ForeignKey(UserBets, on_delete=models.DO_NOTHING, null=True, blank=True, related_name="bet_errors")
+    site = models.ForeignKey(Sites, on_delete=models.DO_NOTHING, null=True, blank=True, related_name="site_errors")
+    message = models.TextField(blank=True, null=True)
+    site_message = models.TextField(blank=True, null=True)
+    status = models.IntegerField(default=BET_ERROR_STATUS[0][0])
+    created = models.DateTimeField(null=True, auto_now_add=True)
+    modified = models.DateTimeField(null=True, auto_now=True)
+
+    def __str__(self):
+        return 'Bet message: {}'.format(self.message)
