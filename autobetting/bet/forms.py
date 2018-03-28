@@ -63,7 +63,7 @@ class UserBetForm(WidgetAttributesMixin, forms.ModelForm):
 
         current_weeks = (((timezone.now()+datetime.timedelta(days=x)).date(),
                           (timezone.now()+datetime.timedelta(days=x)).date()) for x in range(0, 7))
-        self.fields['bid_date'] = forms.ChoiceField(choices=current_weeks, widget=forms.RadioSelect)
+        self.fields['bet_date'] = forms.ChoiceField(choices=current_weeks, widget=forms.RadioSelect)
 
     def save(self, request):
         """

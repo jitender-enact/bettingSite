@@ -105,13 +105,13 @@
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <div class="tabs">
-                                    {% for choice in form.bid_date %}
+                                    {% for choice in form.bet_date %}
                                         <div class="tab frst-child">
                                             {{ choice }}
                                         </div>
                                     {% endfor %}
-                                    {% if form.bid_date %}
-                                        <div class="with-errors text-danger">{{ form.form.bid_date.errors.as_text }}</div>
+                                    {% if form.bet_date %}
+                                        <div class="with-errors text-danger">{{ form.form.bet_date.errors.as_text }}</div>
                                     {% else %}
                                         <div class="with-errors text-danger"></div>
                                     {% endif %}

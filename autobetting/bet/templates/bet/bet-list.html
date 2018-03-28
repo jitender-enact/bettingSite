@@ -50,7 +50,7 @@
                             <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'rotation' %}-rotation{% else %}rotation{% endifequal %}">Rotation</a>
                         </th>
                         <th>
-                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'bid_date' %}-bid_date{% else %}bid_date{% endifequal %}">Date</a>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'bet_date' %}-bet_date{% else %}bet_date{% endifequal %}">Date</a>
                         </th>
                         <th>
                             <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'selected_line' %}-selected_line{% else %}selected_line{% endifequal %}">Selected Line</a>
@@ -79,7 +79,7 @@
                             <td>{{ obj.game_interval|get_game_interval }}</td>
                             <td>{{ obj.game_team }}</td>
                             <td>{{ obj.rotation }}</td>
-                            <td>{{ obj.bid_date }}</td>
+                            <td>{{ obj.bet_date }}</td>
                             <td>{{ obj.selected_line|get_selected_line }}</td>
                             <td>{{ obj.incoming_line }}</td>
                             <td>{{ obj.incoming_juice }}</td>
