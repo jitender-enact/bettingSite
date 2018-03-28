@@ -76,7 +76,7 @@ class UserBets(models.Model):
     incoming_line = models.CharField(max_length=12, null=True, blank=True)
     incoming_juice = models.CharField(max_length=12, null=True, blank=True)
     amount = models.DecimalField(max_digits=11, decimal_places=3, default=0)
-    bid_date = models.DateField(null=True, blank=True)
+    bet_date = models.DateField(null=True, blank=True)
     created = models.DateTimeField(null=True, auto_now_add=True)
     modified = models.DateTimeField(null=True, auto_now=True)
 
