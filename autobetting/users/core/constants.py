@@ -9,3 +9,9 @@ MSG_CHANGE_PASSWORD_SUCCESS = "Your password has been updated successfully."
 # BET MESSAGES
 
 BET_SAVED = "Betting on all sites. Check betting status on Bet Status Page."
+
+
+# CRAWLING ERROR MSG
+
+INVALID_INTERVAL_SELECTED = "Invalid interval selected."
+INVALID_GAME_TYPE_SELECTED = "Invalid game selected."
