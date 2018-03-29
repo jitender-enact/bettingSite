@@ -12,6 +12,7 @@ BET_SAVED = "Betting on all sites. Check betting status on Bet Status Page."
 
 
 # CRAWLING ERROR MSG
-
+INVALID_SERVER_ERROR = "Server Error (may be server has down or too many connections)"
+INVALID_CREDENTIALS = "Login Authorisation failed. Please check your password."
 INVALID_INTERVAL_SELECTED = "Invalid interval selected."
 INVALID_GAME_TYPE_SELECTED = "Invalid game selected."
