@@ -6,7 +6,9 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from users.core import constants as MSG
 from bet.forms import UserBetForm
-from bet.models import UserBets, BetErrors
+from bet.models import UserBets, BetErrors, UserSiteCredentials, Sites, BET_ERROR_STATUS
+
+from bet.scrape_sites.diamondsb_site import DiamondsSite
 # Create your views here.
 
 
@@ -33,6 +35,10 @@ class ListBetView(generic.ListView):
 class ListBetStatusView(generic.ListView):
     template_name = "bet/bet-error-list.html"
 
+    def get(self, request, bet_id, *args, **kwargs):
+        self.bet_id = bet_id
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self):
         """
         Overwrite the get_queryset method.
@@ -41,7 +47,7 @@ class ListBetStatusView(generic.ListView):
         also apply the sorting on the basis of given `sort` field
         :return BetStatus queryset:
         """
-        bet_id = self.request.GET.get('bet', None)
+        bet_id = self.bet_id
         sort_field = self.request.GET.get('sort', None)
         order_field = '-id'
 
@@ -79,7 +85,9 @@ class CreateBetView(generic.FormView):
         if form.is_valid():
             # Call parent form_valid to create model record object
             super().form_valid(form)
-            form.save(request)
+            betObject = form.save(request)
+
+            self.initializeCrawling(betObject)
             # Add custom success message
             messages.success(request, MSG.BET_SAVED)
             # Redirect to success page
@@ -89,3 +97,25 @@ class CreateBetView(generic.FormView):
         self.object = None
         # Return class-based view form_invalid to generate form with errors
         return self.form_invalid(form)
+
+    def initializeCrawling(self, betObject):
+
+        credentials = UserSiteCredentials.objects.filter(user__id= self.request.user.id).first()
+        if credentials:
+            betErrors = BetErrors.objects.create(**{
+                "bet_id": betObject.id,
+                "site_id": credentials.site.id,
+                "message": "Pending"
+            })
+            import threading
+            t = threading.Thread(target=self.startThread, args=(betObject, credentials, betErrors), kwargs={})
+            t.setDaemon(True)
+            t.start()
+
+
+    def startThread(self, betObject, credentials, betErrors):
+        site = DiamondsSite(betObject, credentials, betErrors)
+        print(site.crawling())
+
+
+
