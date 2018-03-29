@@ -131,5 +131,9 @@ STATICFILES_DIRS = (
 
 USER_EMAIL = "noreply@autobetting.com"
 
+# setting the betting live
+LIVE_BETTING = False
+
+
 import django_heroku
 django_heroku.settings(locals())
