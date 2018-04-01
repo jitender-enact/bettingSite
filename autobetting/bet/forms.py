@@ -1,5 +1,5 @@
 from django import forms
-from bet.models import UserBets, GAME_INTERVALS, GAME_TYPES,  SELECTED_LINES
+from bet.models import UserBets, UserSiteCredentials, Sites, GAME_INTERVALS, GAME_TYPES,  SELECTED_LINES
 from users.forms import WidgetAttributesMixin
 from django.utils import timezone
 import datetime
@@ -64,6 +64,55 @@ class UserBetForm(WidgetAttributesMixin, forms.ModelForm):
         current_weeks = (((timezone.now()+datetime.timedelta(days=x)).date(),
                           (timezone.now()+datetime.timedelta(days=x)).date()) for x in range(0, 7))
         self.fields['bet_date'] = forms.ChoiceField(choices=current_weeks, widget=forms.RadioSelect)
+
+    def save(self, request):
+        """
+        Overwrite the save method and set the user before saving the UserBets instance
+        :param request:
+        :return UserBets instance:
+        """
+        self.instance.user = request.user
+        return super().save()
+
+
+class UserSiteCredentialsFrom(WidgetAttributesMixin, forms.ModelForm):
+    """
+    UserBetForm used for creating and validating the UserBet
+    """
+    class Meta:
+        model = UserSiteCredentials
+        exclude = ['user', 'is_active', 'created', 'modified']
+
+    def __init__(self, *args, **kwargs):
+        """
+        Applied some css class and placeholders into the all
+         fields of the UserBetForm form.
+        """
+        self.request = kwargs.pop("request")
+        super().__init__(*args, **kwargs)
+
+        self.update_the_widget_attr('username', {
+            'class': 'form-control',
+            'autofocus': False,
+            'placeholder': 'Username/Email',
+        })
+
+        self.update_the_widget_attr('password', {
+            'class': 'form-control',
+            'autofocus': False,
+            'placeholder': 'Password',
+        })
+
+        already_selected = UserSiteCredentials.objects.filter(user__id=self.request.user.id).values("site_id")
+        sites = Sites.objects.filter(is_active=True).exclude(id__in=already_selected)
+        self.fields['site'] = forms.ModelChoiceField(queryset=sites,
+                                                     widget=forms.Select)
+        self.update_the_widget_attr('site', {
+            'class': 'form-control',
+            'autofocus': False,
+            'placeholder': 'Please select Site',
+        })
+
 
     def save(self, request):
         """

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.contrib import messages
 from users.core import constants as MSG
-from bet.forms import UserBetForm
+from bet.forms import UserBetForm, UserSiteCredentialsFrom
 from bet.models import UserBets, BetErrors, UserSiteCredentials, Sites, BET_ERROR_STATUS
 
 from bet.scrape_sites.diamondsb_site import DiamondsSite
@@ -119,3 +119,70 @@ class CreateBetView(generic.FormView):
 
 
 
+class CreateUserCredentialsView(generic.FormView):
+    """
+    View handle and show the user credentials
+    """
+    template_name = "bet/user-site-credentails.html"
+    form_class = UserSiteCredentialsFrom
+    success_url = reverse_lazy('bet:create_bet_page')
+
+    @method_decorator(login_required(login_url=reverse_lazy('users:login')))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'request': self.request})
+        return kwargs
+
+    def get(self, request, *args, **kwargs):
+        form = super(CreateUserCredentialsView, self).get_form()
+        # Set initial values and custom widget
+        initial_base = self.get_initial()
+        initial_base.update({'request': request})
+        form.initial = initial_base
+        # return response using standard render() method
+        return render(request, self.template_name,
+                      {'form': form,
+                       'special_context_variable': 'My special context variable!!!'})
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        initial_base = self.get_initial()
+        initial_base.update({'request': request})
+        # Verify form is valid
+        if form.is_valid():
+            # Call parent form_valid to create model record object
+            super().form_valid(form)
+            betObject = form.save(request)
+
+            self.initializeCrawling(betObject)
+            # Add custom success message
+            messages.success(request, MSG.BET_SAVED)
+            # Redirect to success page
+            return HttpResponseRedirect(self.get_success_url())
+        # Form is invalid
+        # Set object to None, since class-based view expects model record object
+        self.object = None
+        # Return class-based view form_invalid to generate form with errors
+        return self.form_invalid(form)
+
+    def initializeCrawling(self, betObject):
+
+        credentials = UserSiteCredentials.objects.filter(user__id= self.request.user.id).first()
+        if credentials:
+            betErrors = BetErrors.objects.create(**{
+                "bet_id": betObject.id,
+                "site_id": credentials.site.id,
+                "message": "Pending"
+            })
+            import threading
+            t = threading.Thread(target=self.startThread, args=(betObject, credentials, betErrors), kwargs={})
+            t.setDaemon(True)
+            t.start()
+
+
+    def startThread(self, betObject, credentials, betErrors):
+        site = DiamondsSite(betObject, credentials, betErrors)
+        print(site.crawling())

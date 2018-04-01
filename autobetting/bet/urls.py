@@ -11,4 +11,7 @@ urlpatterns = [
     path('bet-status/<int:bet_id>/',
          views.ListBetStatusView.as_view(),
          name="list_bet_status_page"),
+    path('site-credentials/',
+         views.CreateUserCredentialsView.as_view(),
+         name="create_credentials_page"),
 ]

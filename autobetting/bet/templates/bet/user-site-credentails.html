@@ -1,0 +1,94 @@
+{% extends "users/layout/base.html" %}
+{% load staticfiles %}
+
+{% block css_header %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/bootstrap-switch.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% block body_block %}
+    {% include 'users/layout/header.html' %}
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <p class="bg-success ele-font-size text-center text-success element-pedding {% if message.tags %} {{ message.tags }} {% endif %}">
+                    {{ message }}
+                </p>
+            {% endfor %}
+        {% endif %}
+        <div class="site-index">
+            <div class="Wrapper">
+                <form class="form-horizontal bet-form"
+                      id="betForm"
+                      method="post"
+                      action="{% url 'bet:create_bet_page' %}"
+                      data-toggle="validator">
+                    <div class="container">
+                        {#                        {{ form }}#}
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <p class="bg-danger ele-font-size text-center text-danger element-pedding">{{ form.non_field_errors.as_text }}</p>
+                        {% endif %}
+                        <div class="form-group ">
+                            <div class="col-sm-6">
+                                {{ form.site }}
+                                {% if form.site.errors %}
+                                    <div class="with-errors text-danger">{{ form.site.errors.as_text }}</div>
+                                {% else %}
+                                    <div class="with-errors text-danger"></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <div class="col-sm-6">
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="with-errors text-danger">{{ form.username.errors.as_text }}</div>
+                                {% else %}
+                                    <div class="with-errors text-danger"></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <div class="col-sm-6">
+                                {{ form.password }}
+                                {% if form.password.errors %}
+                                    <div class="with-errors text-danger">{{ form.password.errors.as_text }}</div>
+                                {% else %}
+                                    <div class="with-errors text-danger"></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-5">
+                                <!-- <button type="submit" class="btn btn-default preview">Submit</button> -->
+                                <button type="submit" class="btn btn-primary preview">Submit</button>
+                                <button type="button" class="btn btn-default clear">Clear</button>
+                            </div><!-- col-md -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% include 'users/layout/footer.html' %}
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+{% endblock %}
+
+{% block js_footer %}
+    {{ block.super }}
+    <script src="{% static 'js/custom.js' %}"></script>
+{% endblock %}
