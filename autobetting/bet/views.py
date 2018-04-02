@@ -9,7 +9,7 @@ from users.core import constants as MSG
 from bet.forms import UserBetForm, UserSiteCredentialsFrom
 from bet.models import UserBets, BetErrors, UserSiteCredentials, Sites, BET_ERROR_STATUS
 
-from bet.scrape_sites.diamondsb_site import DiamondsSite
+from bet.scrape_sites.diamond_eight_betbruh_site import DiamondEightBetbruhSite
 # Create your views here.
 
 
@@ -103,22 +103,32 @@ class CreateBetView(generic.FormView):
 
     def initializeCrawling(self, betObject):
 
-        credentials = UserSiteCredentials.objects.filter(user__id= self.request.user.id).first()
-        if credentials:
-            betErrors = BetErrors.objects.create(**{
-                "bet_id": betObject.id,
-                "site_id": credentials.site.id,
-                "message": "Pending"
-            })
-            import threading
-            t = threading.Thread(target=self.startThread, args=(betObject, credentials, betErrors), kwargs={})
-            t.setDaemon(True)
-            t.start()
+        credentials = UserSiteCredentials.objects.filter(user__id= self.request.user.id)
 
+        if credentials:
+            for credential in credentials:
+                betErrors = BetErrors.objects.create(**{
+                    "bet_id": betObject.id,
+                    "site_id": credential.site.id,
+                    "message": "Pending"
+                })
+                self.startThread(betObject, credential, betErrors)
+                # import threading
+                # t = threading.Thread(target=self.startThread, args=(betObject, credential, betErrors), kwargs={})
+                # t.setDaemon(True)
+                # t.start()
 
     def startThread(self, betObject, credentials, betErrors):
-        site = DiamondsSite(betObject, credentials, betErrors)
-        print(site.crawling())
+        def site_crawling(betObject, credentials, betErrors):
+            site = DiamondEightBetbruhSite(betObject, credentials, betErrors)
+            print(betObject, credentials.username, credentials.password, betErrors)
+            print(site.SITE_PAGES, betErrors.site.site_link)
+            site.crawling()
+
+        import threading
+        t = threading.Thread(target=site_crawling, args=(betObject, credentials, betErrors), kwargs={})
+        t.setDaemon(True)
+        t.start()
 
 
 class ListUserCredentialsView(generic.ListView):
@@ -139,8 +149,6 @@ class ListUserCredentialsView(generic.ListView):
             if sort_field.replace("-", "") in [f.name for f in UserSiteCredentials._meta.get_fields()]:
                 order_field = sort_field
         return UserSiteCredentials.objects.filter(user__id=self.request.user.id).order_by(order_field)
-
-
 
 
 class CreateUserCredentialsView(generic.FormView):
