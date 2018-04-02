@@ -4,6 +4,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.conf import settings
 from users.core import constants as MSG
 from bet.forms import UserBetForm, UserSiteCredentialsFrom
 from bet.models import UserBets, BetErrors, UserSiteCredentials, Sites, BET_ERROR_STATUS
@@ -14,6 +15,7 @@ from bet.scrape_sites.diamondsb_site import DiamondsSite
 
 class ListBetView(generic.ListView):
     template_name = "bet/bet-list.html"
+    paginate_by = settings.LIST_VIEW_PAGINATION
 
     def get_queryset(self):
         """
@@ -34,6 +36,7 @@ class ListBetView(generic.ListView):
 
 class ListBetStatusView(generic.ListView):
     template_name = "bet/bet-error-list.html"
+    paginate_by = settings.LIST_VIEW_PAGINATION
 
     def get(self, request, bet_id, *args, **kwargs):
         self.bet_id = bet_id
@@ -63,7 +66,7 @@ class CreateBetView(generic.FormView):
     """
     template_name = "bet/bet-create.html"
     form_class = UserBetForm
-    success_url = reverse_lazy('bet:create_bet_page')
+    success_url = reverse_lazy('bet:list_credentials_page')
 
     @method_decorator(login_required(login_url=reverse_lazy('users:login')))
     def dispatch(self, request, *args, **kwargs):
@@ -118,12 +121,33 @@ class CreateBetView(generic.FormView):
         print(site.crawling())
 
 
+class ListUserCredentialsView(generic.ListView):
+    template_name = "bet/user-site-credentials-list.html"
+    paginate_by = settings.LIST_VIEW_PAGINATION
+
+    def get_queryset(self):
+        """
+        Overwrite the get_queryset method.
+
+        this method return the all `UserBets` of currently logged in user.
+        also apply the sorting on the basis of given `sort` field
+        :return UserBets queryset:
+        """
+        sort_field = self.request.GET.get('sort', None)
+        order_field = '-id'
+        if sort_field:
+            if sort_field.replace("-", "") in [f.name for f in UserSiteCredentials._meta.get_fields()]:
+                order_field = sort_field
+        return UserSiteCredentials.objects.filter(user__id=self.request.user.id).order_by(order_field)
+
+
+
 
 class CreateUserCredentialsView(generic.FormView):
     """
     View handle and show the user credentials
     """
-    template_name = "bet/user-site-credentails.html"
+    template_name = "bet/user-site-credentials-create.html"
     form_class = UserSiteCredentialsFrom
     success_url = reverse_lazy('bet:create_bet_page')
 
@@ -155,11 +179,10 @@ class CreateUserCredentialsView(generic.FormView):
         if form.is_valid():
             # Call parent form_valid to create model record object
             super().form_valid(form)
-            betObject = form.save(request)
+            form.save(request)
 
-            self.initializeCrawling(betObject)
             # Add custom success message
-            messages.success(request, MSG.BET_SAVED)
+            messages.success(request, MSG.CREDENTIALS_SAVED)
             # Redirect to success page
             return HttpResponseRedirect(self.get_success_url())
         # Form is invalid
@@ -167,22 +190,3 @@ class CreateUserCredentialsView(generic.FormView):
         self.object = None
         # Return class-based view form_invalid to generate form with errors
         return self.form_invalid(form)
-
-    def initializeCrawling(self, betObject):
-
-        credentials = UserSiteCredentials.objects.filter(user__id= self.request.user.id).first()
-        if credentials:
-            betErrors = BetErrors.objects.create(**{
-                "bet_id": betObject.id,
-                "site_id": credentials.site.id,
-                "message": "Pending"
-            })
-            import threading
-            t = threading.Thread(target=self.startThread, args=(betObject, credentials, betErrors), kwargs={})
-            t.setDaemon(True)
-            t.start()
-
-
-    def startThread(self, betObject, credentials, betErrors):
-        site = DiamondsSite(betObject, credentials, betErrors)
-        print(site.crawling())

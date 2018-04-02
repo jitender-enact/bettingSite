@@ -14,4 +14,7 @@ urlpatterns = [
     path('site-credentials/',
          views.CreateUserCredentialsView.as_view(),
          name="create_credentials_page"),
+    path('site-credential-list/',
+         views.ListUserCredentialsView.as_view(),
+         name="list_credentials_page"),
 ]
