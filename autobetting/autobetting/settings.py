@@ -133,6 +133,7 @@ USER_EMAIL = "noreply@autobetting.com"
 
 # setting the betting live
 LIVE_BETTING = False
+LIST_VIEW_PAGINATION = 10
 
 
 import django_heroku
