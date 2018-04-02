@@ -77,7 +77,7 @@ class UserBetForm(WidgetAttributesMixin, forms.ModelForm):
 
 class UserSiteCredentialsFrom(WidgetAttributesMixin, forms.ModelForm):
     """
-    UserBetForm used for creating and validating the UserBet
+    UserSiteCredentialsFrom used for creating and validating the UserSiteCredentials
     """
     class Meta:
         model = UserSiteCredentials
@@ -103,8 +103,8 @@ class UserSiteCredentialsFrom(WidgetAttributesMixin, forms.ModelForm):
             'placeholder': 'Password',
         })
 
-        already_selected = UserSiteCredentials.objects.filter(user__id=self.request.user.id).values("site_id")
-        sites = Sites.objects.filter(is_active=True).exclude(id__in=already_selected)
+        # already_selected = UserSiteCredentials.objects.filter(user__id=self.request.user.id).values("site_id")
+        sites = Sites.objects.filter(is_active=True)  # .exclude(id__in=already_selected)
         self.fields['site'] = forms.ModelChoiceField(queryset=sites,
                                                      widget=forms.Select)
         self.update_the_widget_attr('site', {
@@ -113,12 +113,21 @@ class UserSiteCredentialsFrom(WidgetAttributesMixin, forms.ModelForm):
             'placeholder': 'Please select Site',
         })
 
-
     def save(self, request):
         """
-        Overwrite the save method and set the user before saving the UserBets instance
+        Overwrite the save method and set the user before saving the UserSiteCredentials instance
         :param request:
-        :return UserBets instance:
+        :return UserSiteCredentials instance:
         """
         self.instance.user = request.user
+
+        # if selected site already exists in UserSiteCredentials, then update the instance otherwise
+        # create new instance
+        if self.cleaned_data["site"]:
+            instance = UserSiteCredentials.objects.filter(site__id=self.cleaned_data["site"].id,
+                                                          user__id=request.user.id).first()
+            if instance:
+                self.instance = instance
+                self.instance.username = self.cleaned_data["username"]
+                self.instance.password = self.cleaned_data["password"]
         return super().save()
