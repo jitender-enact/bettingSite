@@ -35,34 +35,34 @@
                     <tr>
                         <th>#</th>
                         <th>
-                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_name' %}-game_name{% else %}game_name{% endifequal %}">Game Name</a>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_name' %}-game_name{% else %}game_name{% endifequal %}&page={{ request.GET.page }}">Game Name</a>
                         </th>
                         <th>
-                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_type' %}-game_type{% else %}game_type{% endifequal %}">Game</a>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_type' %}-game_type{% else %}game_type{% endifequal %}&page={{ request.GET.page }}">Game</a>
                         </th>
                         <th>
-                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_interval' %}-game_interval{% else %}game_interval{% endifequal %}">Interval Name</a>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_interval' %}-game_interval{% else %}game_interval{% endifequal %}&page={{ request.GET.page }}">Interval Name</a>
                         </th>
                         <th>
-                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_team' %}-game_team{% else %}game_team{% endifequal %}">Game Team</a>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'game_team' %}-game_team{% else %}game_team{% endifequal %}&page={{ request.GET.page }}">Game Team</a>
                         </th>
                         <th>
-                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'rotation' %}-rotation{% else %}rotation{% endifequal %}">Rotation</a>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'rotation' %}-rotation{% else %}rotation{% endifequal %}&page={{ request.GET.page }}">Rotation</a>
                         </th>
                         <th>
-                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'bet_date' %}-bet_date{% else %}bet_date{% endifequal %}">Date</a>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'bet_date' %}-bet_date{% else %}bet_date{% endifequal %}&page={{ request.GET.page }}">Date</a>
                         </th>
                         <th>
-                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'selected_line' %}-selected_line{% else %}selected_line{% endifequal %}">Selected Line</a>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'selected_line' %}-selected_line{% else %}selected_line{% endifequal %}&page={{ request.GET.page }}">Selected Line</a>
                         </th>
                         <th>
-                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'incoming_line' %}-incoming_line{% else %}incoming_line{% endifequal %}">Incoming Line</a>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'incoming_line' %}-incoming_line{% else %}incoming_line{% endifequal %}&page={{ request.GET.page }}">Incoming Line</a>
                         </th>
                         <th>
-                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'incoming_juice' %}-incoming_juice{% else %}incoming_juice{% endifequal %}">Incoming Juice</a>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'incoming_juice' %}-incoming_juice{% else %}incoming_juice{% endifequal %}&page={{ request.GET.page }}">Incoming Juice</a>
                         </th>
                         <th>
-                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'amount' %}-amount{% else %}amount{% endifequal %}">Amount</a>
+                            <a href="{% url 'bet:list_bet_page' %}?sort={% ifequal request.GET.sort 'amount' %}-amount{% else %}amount{% endifequal %}&page={{ request.GET.page }}">Amount</a>
                         </th>
                         <th class="action-column">&nbsp;</th>
                     </tr>
@@ -93,6 +93,7 @@
                     {% endfor %}
                     </tbody>
                 </table>
+                {% include "users/layout/pagination.html" %}
             </div>
         </div>
     </div>
