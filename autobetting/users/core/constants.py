@@ -13,7 +13,18 @@ CREDENTIALS_SAVED = "Credentials of sites has been saved."
 
 
 # CRAWLING ERROR MSG
+NOT_FOUND_RESPONSE = "Server error!! Unable to get the response from site."
 INVALID_SERVER_ERROR = "Server Error (may be server has down or too many connections)"
-INVALID_CREDENTIALS = "Login Authorisation failed. Please check your password."
-INVALID_INTERVAL_SELECTED = "Invalid interval selected."
+INVALID_CREDENTIALS = "Login Authorisation failed. Please check your credentials."
+NO_BET_ENTERED = "You have no entered any bets yet. please try again."
+INSUFFICIENT_BALANCE = "You have placed wagers that exceed your available balance. Please try again."
+MINIMUM_WAGER_LIMIT = "You have placed wagers that are under your minimum wager limit. Please try again."
+
+GAME_NOT_FOUND = "Game Not found."
+PROVIDED_ODDS_NOT_MATCH = "Provided Odds are invalid."
+ROTATION_NUMBER_NOT_FOUND = "Rotation No. not found for this date."
+
+INVALID_INTERVAL_SELECTED = "Invalid selected game interval."
 INVALID_GAME_TYPE_SELECTED = "Invalid game selected."
+
+BET_PLACED = "Bet placed"
