@@ -128,6 +128,13 @@ class DiamondEightBetbruhSite(BaseSite):
         self.credentialObject = credentialObject
         self.betErrorObject = betErrorModelObject
 
+        self.GAME_TYPES = {}
+        for key, val in GAME_TYPES:
+            if val == "BASKETBALL COLLEGE":
+                self.GAME_TYPES.update({key: "NCAA"})
+            else:
+                self.GAME_TYPES.update({key: val})
+
     def siteLogin(self):
         """
         Login to the Site
@@ -147,7 +154,7 @@ class DiamondEightBetbruhSite(BaseSite):
         select game from 'page_response' object
         """
         soup = BeautifulSoup(self.page_response.text, 'html.parser')
-        supportedGames = {key: "{}FULLGAME".format(val) for key, val in GAME_TYPES}
+        supportedGames = {key: "{}FULLGAME".format(val) for key, val in self.GAME_TYPES.items()}
         nextLink = None
         for tag in soup.find_all('a'):
             text = tag.get_text(strip=True).upper()
@@ -301,7 +308,7 @@ class DiamondEightBetbruhSite(BaseSite):
         self.scrape_process.SITE_PAGES['page_6']["post_data"] = [(key, val) for key, val in post_data.items()]
 
     def crawling(self):
-        game_types = {key: value for key, value in GAME_TYPES}
+        game_types = self.GAME_TYPES
         game_interval = {key: value for key, value in GAME_INTERVALS}
         self.initial_validation(game_interval[self.ModelObject.game_interval], game_types[self.ModelObject.game_type])
         if self.IsError:
