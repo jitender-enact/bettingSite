@@ -11,6 +11,7 @@ class BaseSite:
     ErrorMsg = None
     AcceptedGameType = []
     AcceptedGameIntervals = []
+    AcceptedGameCombination = {}
 
     def initial_validation(self, game_interval, game_type):
         """
@@ -26,6 +27,12 @@ class BaseSite:
         if self.AcceptedGameType:
             if not (game_type in self.AcceptedGameType):
                 self.set_message(True, ERROR_MSG.INVALID_GAME_TYPE_SELECTED)
+
+        if self.AcceptedGameCombination and not self.IsError:
+            if not (game_type in self.AcceptedGameCombination):
+                self.set_message(True, ERROR_MSG.INVALID_GAME_TYPE_SELECTED)
+            elif not (game_interval in self.AcceptedGameCombination[game_type]):
+                self.set_message(True, ERROR_MSG.INVALID_INTERVAL_SELECTED)
 
     def set_message(self, is_error, message):
         """
