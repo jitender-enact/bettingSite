@@ -113,10 +113,6 @@ class CreateBetView(generic.FormView):
                     "message": "Pending"
                 })
                 self.startThread(betObject, credential, betErrors)
-                # import threading
-                # t = threading.Thread(target=self.startThread, args=(betObject, credential, betErrors), kwargs={})
-                # t.setDaemon(True)
-                # t.start()
 
     def startThread(self, betObject, credentials, betErrors):
         def site_crawling(betObject, credentials, betErrors):
