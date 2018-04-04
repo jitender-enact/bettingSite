@@ -49,7 +49,7 @@ class OcbetVegaBetevoLoveSite(BaseSite):
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                     'Cache-Control': 'max-age=0',
-                    'Referer': 'http://vegassb.net/vegassb_login_english.asp?m=',
+                    'Referer': '{}/vegassb_login_english.asp?m=',
                     'Connection': 'keep-alive',
                 },
                 "post_data": [
@@ -60,13 +60,13 @@ class OcbetVegaBetevoLoveSite(BaseSite):
             "page_4": {
                 "method": "get",
                 "url": "{}/BbSportSelection.asp",
-                "update_headrs": {
+                "update_headers": {
                     'Origin': '{}',
                     'Accept-Encoding': 'gzip, deflate',
                     'Accept-Language': 'en-US,en;q=0.9',
                     'Upgrade-Insecure-Requests': '1',
                     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-                    'Referer': 'http://vegassb.net/CustomerDashboard.asp',
+                    'Referer': '{}/CustomerDashboard.asp',
                     'Connection': 'keep-alive',
                     'Cache-Control': 'max-age=0',
                 }
@@ -74,7 +74,7 @@ class OcbetVegaBetevoLoveSite(BaseSite):
             "page_5": {
                 "method": "post",
                 "url": "{}/BbGameSelection.asp",
-                "update_headrs": {
+                "update_headers": {
                     'Origin': '{}',
                     'Accept-Encoding': 'gzip, deflate',
                     'Accept-Language': 'en-US,en;q=0.9',
@@ -82,7 +82,23 @@ class OcbetVegaBetevoLoveSite(BaseSite):
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                     'Cache-Control': 'max-age=0',
-                    'Referer': 'http://vegassb.net/BbSportSelection.asp',
+                    'Referer': '{}/BbSportSelection.asp',
+                    'Connection': 'keep-alive',
+                },
+                "post_data": []
+            },
+            "page_6": {
+                "method": "post",
+                "url": "{}/BbVerifyWager.asp",
+                "update_headers": {
+                    'Origin': '{}',
+                    'Accept-Encoding': 'gzip, deflate',
+                    'Accept-Language': 'en-US,en;q=0.9',
+                    'Upgrade-Insecure-Requests': '1',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+                    'Cache-Control': 'max-age=0',
+                    'Referer': '{}/BbGameSelection.asp',
                     'Connection': 'keep-alive',
                 },
                 "post_data": []
@@ -128,6 +144,7 @@ class OcbetVegaBetevoLoveSite(BaseSite):
         try:
             self.page_response = self.scrape_process.getPage()  # get first page to initialize the cookies and session
             self.scrape_process.SITE_PAGES["page_2"]['url'] = self.page_response.url
+            self.scrape_process.SITE_PAGES["page_3"]['update_headers']['Referer'] = self.page_response.url
             self.scrape_process.nextPage()  # set next page
             self.page_response = self.scrape_process.getPage()
 
@@ -170,12 +187,10 @@ class OcbetVegaBetevoLoveSite(BaseSite):
         if form:
             post_data = {}
             inputs = form.find_all("input")
-            print(supportedGames[select_game])
             for tag in inputs:
                 if tag['type'] and (tag['type'].lower() == 'hidden' or tag['type'].lower() == 'submit'):
                     post_data.update({tag['name']: tag['value']})
                 if tag['name'] and tag['name'].upper() == supportedGames[select_game]:
-                    print(tag['name'])
                     post_data.update({tag['name']: "on"})
 
             if not inputs:
@@ -203,112 +218,94 @@ class OcbetVegaBetevoLoveSite(BaseSite):
 
         # set the all hidden and other input and select element  values in `post_data`
         form = soup.find("form", attrs={"name": "GameSelectionForm"})
-        table = soup.find("table", attrs={"class": "lines-offering"})
+        table = form.find("table", attrs={"class": "lines-offering"})
 
-        tr = []
+        for input_ele in form.find_all("input", attrs={"type": "hidden"}):
+            post_data.update({input_ele['name']: input_ele['value'] if input_ele.has_attr('value') else ""})
+
+        date = "{date:%a} {date.month}/{date.day}".format(date=self.ModelObject.bet_date)
+
+        game_element = None
+
         for row in table.find_all("tr"):
-            if not row.find("td").has_attr("colspan"):
-                tr.append(row)
+            if row.find("td") and row.find("td").get_text(strip=True) == date:
+
+                tds = row.find_all("td")
+
+                # td [1] for getting the rotation value
+                rotation_td = tds[1].get_text(strip=True) if tds and len(tds) > 0 else None
 
 
-        #
-        # date = datetime.datetime.strftime(self.ModelObject.bet_date, "%B %d, %Y")
-        #
-        # # find out game_element (not offline)
-        # game_name_div = [tag for tag in soup.find_all("div", attrs={'class': 'gameName'})
-        #                  if date in tag.get_text(strip=True) and not ("OFFLINE" in tag.get_text(strip=True))]
-        # for ele in game_name_div:
-        #     table = ele.find_next_sibling('table', attrs={"class": "gameTeams"})
-        #     table_tds = table.find_all("td", attrs={'class': 'sportTitle'})
-        #     for td in table_tds:
-        #         if "{}".format(self.ModelObject.rotation) in td.get_text(strip=True):
-        #             game_element = td.parent
-        #
-        # # map the selected_lines with css class names
-        # selected_line_names_map = {SELECTED_LINES[0][1]: "pointSpread",
-        #                            SELECTED_LINES[2][1]: "moneyLine",
-        #                            SELECTED_LINES[1][1]: "totalPoints",
-        #                            SELECTED_LINES[3][1]: "teamTotal"
-        #                            }
-        #
-        # selected_line_names = {key: value for key, value in SELECTED_LINES}  # dict of selected lines
-        #
-        # # define the css class
-        # selected_line_class = selected_line_names_map[selected_line_names[self.ModelObject.selected_line]]
-        #
-        # if game_element:
-        #     ele = None
-        #     if selected_line_class == "pointSpread":
-        #         pointSpreadEle = game_element.findChild('td', attrs={'class': selected_line_class})
-        #         if pointSpreadEle:
-        #             ele = pointSpreadEle.findChild('table')
-        #     else:
-        #         ele = game_element.findChild('td', attrs={'class': selected_line_class})
-        #
-        #     inputEle = ele.findChild('input')
-        #     if inputEle:
-        #
-        #         # set amount
-        #         post_data.update({inputEle['name']: self.ModelObject.amount})
-        #
-        #         if selected_line_class in ["pointSpread", "totalPoints"]:
-        #             selectEle = ele.findChild('select')
-        #             post_data.update({selectEle['name']: selectEle.findChild('option',
-        #                                                                      attrs={'selected': True})['value']})
-        #             selectEleText = selectEle.findChild('option', attrs={'selected': True}).get_text(strip=True)
-        #             selectEleTextList = selectEleText.split(" ")
-        #
-        #             total_point = ["OV", "UN"]
-        #
-        #             # calculate the incomingJuiceRS and incomingLineRS on the basis of fraction values
-        #             for key, val in enumerate(selectEleTextList):
-        #                 if val == "Even":
-        #                     selectEleTextList[key] = 100
-        #
-        #                 if val in FRACTION_VALUES:
-        #                     fraction = FRACTION_VALUES[val] if (int(selectEleTextList[key - 1]) > 0) \
-        #                         else -1 * FRACTION_VALUES[val]
-        #                     if key == (len(selectEleTextList) - 1):
-        #                         incomingJuiceRS = int(selectEleTextList[key - 1]) + fraction
-        #                     else:
-        #                         incomingLineRS = int(selectEleTextList[key - 1]) + fraction
-        #                 elif val in total_point:
-        #                     if val == "OV":
-        #                         selectEleTextList[key + 1] = -1 * int(selectEleTextList[key + 1])
-        #                     else:
-        #                         selectEleTextList[key] = int(selectEleTextList[key])
-        #                 else:
-        #                     if key != (len(selectEleTextList) - 1) and incomingLineRS == -1000000000000000:
-        #                         incomingLineRS = int(val)
-        #                     else:
-        #                         incomingJuiceRS = int(val)
-        #
-        #         elif selected_line_class == "moneyLine":
-        #             money_tds = ele.find_all("td")
-        #             incomingLineRS = 0
-        #             if money_tds.length >= 1:
-        #                 td = money_tds[1]
-        #                 incomingJuiceRS = (100 if (td.next_element.strip() == "Even")
-        #                                    else int(td.next_element.strip())
-        #                                    ) if (td.next_element.strip() != "") else incomingJuiceRS
-        #     else:
-        #         pass
-        #         # display input field not found
-        #
-        #
-        # else:
-        #     self.set_message(True, ERROR_MSG.ROTATION_NUMBER_NOT_FOUND)
-        #     return
-        #     # error not found element
-        #
-        # post_data.update({'sbm1': "Submit All Wagers"})
-        #
-        # if (int(self.ModelObject.incoming_line) <= int(incomingLineRS) and
-        #         int(self.ModelObject.incoming_juice) <= int(incomingJuiceRS)):
-        #     self.scrape_process.SITE_PAGES['page_5']["post_data"] = [(key, val) for key, val in post_data.items()]
-        # else:
-        #     # display error of mismatch incomingLines or incomingJuice
-        #     self.set_message(True, ERROR_MSG.PROVIDED_ODDS_NOT_MATCH)
+                if int(rotation_td) == self.ModelObject.rotation:
+                    game_element = row
+                    break
+
+                sibling = row.find_next_sibling("tr")
+                if sibling and (not sibling.has_attr("colspan")):
+                    tds = row.find_all("td")
+
+                    # td [1] for getting the rotation value
+                    rotation_td = tds[1].get_text(strip=True) if tds and len(tds) > 0 else None
+
+                    if int(rotation_td) == self.ModelObject.rotation:
+                        game_element = row
+                        break
+        if game_element:
+            tds = game_element.find_all("td")
+
+            # td[5] = Spread Line, td[6] = Money Line, td[7] = Total Point, td[8] = Team total point
+            selected_lines = {value: key for key, value in SELECTED_LINES}
+            selected_line_index = {selected_lines["SPREAD"]: 5,
+                                   selected_lines["TOTAL"]: 7,
+                                   selected_lines['MONEY LINE']: 6,
+                                   selected_lines["TEAM TOTAL"]: 8}
+
+            index = selected_line_index[self.ModelObject.selected_line] if self.ModelObject.selected_line \
+                                                                           in selected_line_index else None
+
+            if not index is None:
+                element = tds[index]
+                input_ele = element.find("input", attrs={'type': 'text'})
+                if input_ele:
+                    context = element.get_text(strip=True)
+                    context = context.replace(u'\xa0', " ")
+                    context_list = context.split(" ")
+
+                    post_data.update({input_ele['name']: '{0:.2f}'.format(self.ModelObject.amount)})
+
+                    total_point = ["Over", "Under"]
+                    for key, val in enumerate(context_list):
+                        if val == "":
+                            continue
+                        if val in FRACTION_VALUES:
+                            fraction = FRACTION_VALUES[val] if (int(context_list[key - 1]) > 0) \
+                                else -1 * FRACTION_VALUES[val]
+                            if key == (len(context_list) - 1):
+                                incomingJuiceRS = int(context_list[key - 1]) + fraction
+                            else:
+                                incomingLineRS = int(context_list[key - 1]) + fraction
+                        elif val in total_point:
+                            if val == "Over":
+                                context_list[key + 1] = -1 * int(context_list[key + 1])
+                            else:
+                                context_list[key] = int(context_list[key])
+                        elif self.ModelObject.selected_line == selected_lines['MONEY LINE']:
+                            incomingLineRS = 0
+                            if incomingJuiceRS == -1000000000000000:
+                                incomingJuiceRS = int(val)
+                        else:
+                            if key != (len(context_list) - 1) and incomingLineRS == -1000000000000000:
+                                incomingLineRS = int(val)
+                            else:
+                                incomingJuiceRS = int(val)
+
+            if (int(self.ModelObject.incoming_line) <= int(incomingLineRS) and
+                    int(self.ModelObject.incoming_juice) <= int(incomingJuiceRS)):
+                post_data.update({'submit1': 'Continue'})
+                self.scrape_process.SITE_PAGES['page_6']["post_data"] = [(key, val) for key, val in post_data.items()]
+            else:
+                # display error of mismatch incomingLines or incomingJuice
+                self.set_message(True, ERROR_MSG.PROVIDED_ODDS_NOT_MATCH)
 
     def submitBet(self):
         soup = BeautifulSoup(self.page_response.text, 'html.parser')
@@ -368,13 +365,14 @@ class OcbetVegaBetevoLoveSite(BaseSite):
             return
 
         # print(self.page_response.text)
-        # self.applyBet()
-        # if self.IsError:
-        #     self.save_bet_messages(self.betErrorObject)
-        #     return
-        #
-        # self.scrape_process.nextPage()
-        # self.page_response = self.scrape_process.getPage()
+        self.applyBet()
+        if self.IsError:
+            self.save_bet_messages(self.betErrorObject)
+            return
+
+        self.scrape_process.nextPage()
+        self.page_response = self.scrape_process.getPage()
+        print(self.page_response)
         # if self.page_response is None:
         #     self.IsError = True
         #     self.ErrorMsg = ERROR_MSG.NOT_FOUND_RESPONSE
