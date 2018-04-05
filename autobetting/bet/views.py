@@ -102,29 +102,60 @@ class CreateBetView(generic.FormView):
         return self.form_invalid(form)
 
     def initializeCrawling(self, betObject):
+        """
+        Method get all user's site credentials and create the BetErrors object for each credential
+        then call the startThread Method.
 
-        credentials = UserSiteCredentials.objects.filter(user__id= self.request.user.id)
+        Main functionality of this method to get all required objects of model(data from database), so that no need
+        to get the object(Model object) in other method.
+        :param betObject:
+        :return:
+        """
+
+        # get all user site credentials
+        credentials = UserSiteCredentials.objects.filter(user__id=self.request.user.id,
+                                                         is_active=True,
+                                                         site__is_active=True)
 
         if credentials:
             for credential in credentials:
+
+                # create BetErrors Object with with status=1
                 betErrors = BetErrors.objects.create(**{
                     "bet_id": betObject.id,
                     "site_id": credential.site.id,
                     "message": "Pending"
                 })
+
+                # call the startThread method
                 self.startThread(betObject, credential, betErrors)
 
     def startThread(self, betObject, credentials, betErrors):
+        """
+        Start the crawling thread for each site.
+        :param betObject:
+        :param credentials:
+        :param betErrors:
+        :return:
+        """
         def site_crawling(betObject, credentials, betErrors):
+            """
+            start the crawling of site
+            :param betObject:
+            :param credentials:
+            :param betErrors:
+            :return:
+            """
             site = DiamondEightBetbruhSite(betObject, credentials, betErrors)
-            print(betObject, credentials.username, credentials.password, betErrors)
-            print(site.SITE_PAGES, betErrors.site.site_link)
             site.crawling()
 
         import threading
-        t = threading.Thread(target=site_crawling, args=(betObject, credentials, betErrors), kwargs={})
-        t.setDaemon(True)
-        t.start()
+        if credentials.site.site_name.upper() in ["DIAMONDSB", "EIGHTPLAYS", "BETBRUH"]:
+
+            # initialize thread
+            t = threading.Thread(target=site_crawling, args=(betObject, credentials, betErrors), kwargs={})
+            t.setDaemon(True)  # set thread in bg
+            t.start()  # start thread
 
 
 class ListUserCredentialsView(generic.ListView):
