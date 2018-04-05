@@ -28,3 +28,11 @@ INVALID_INTERVAL_SELECTED = "Invalid selected game interval."
 INVALID_GAME_TYPE_SELECTED = "Invalid game selected."
 
 BET_PLACED = "Bet placed"
+
+
+
+# REQUEST ERRORS
+TIMEOUT_ERROR = "HTTP Error 408 - Request Timeout"
+TO_MANY_REDIRECT_ERROR = "ERR_TOO_MANY_REDIRECTS - This Webpage has a Redirect Loop"
+REQUEST_EXCEPTION_ERROR = "There was an ambiguous exception that occurred while handling your request"
+INTERNAL_SERVER_ERROR = "Internal server error"
