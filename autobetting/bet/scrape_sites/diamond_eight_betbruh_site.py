@@ -16,7 +16,7 @@ class DiamondEightBetbruhSite(BaseSite):
     AcceptedGameType = ["NFL", "NCAA", "NBA", "MLB", "NHL"]
     AcceptedGameIntervals = ["GAME"]
     IsError = False
-    ErrorMsg = None
+    ErrorMsg = {}
     SITE_PAGES = {}
 
     def __init__(self, betModelObject, credentialObject, betErrorModelObject):
@@ -146,8 +146,7 @@ class DiamondEightBetbruhSite(BaseSite):
 
         except Exception as e:
             # unable to access site
-            self.IsError = True
-            self.ErrorMsg = ERROR_MSG.INVALID_SERVER_ERROR
+            self.set_message(True, ERROR_MSG.INVALID_SERVER_ERROR)
 
     def selectGame(self):
         """
@@ -322,12 +321,10 @@ class DiamondEightBetbruhSite(BaseSite):
         self.scrape_process.nextPage()
         self.page_response = self.scrape_process.getPage()
         if self.page_response is None:
-            self.IsError = True
-            self.ErrorMsg = ERROR_MSG.NOT_FOUND_RESPONSE
+            self.set_message(True, ERROR_MSG.NOT_FOUND_RESPONSE)
 
         elif self.page_response.url == '{}/'.format(self.siteLink):
-            self.IsError = True
-            self.ErrorMsg = ERROR_MSG.INVALID_CREDENTIALS
+            self.set_message(True, ERROR_MSG.INVALID_CREDENTIALS)
 
         if self.IsError:
             self.save_bet_messages(self.betErrorObject)
@@ -341,8 +338,8 @@ class DiamondEightBetbruhSite(BaseSite):
         self.scrape_process.nextPage()
         self.page_response = self.scrape_process.getPage()
         if self.page_response is None:
-            self.IsError = True
-            self.ErrorMsg = ERROR_MSG.NOT_FOUND_RESPONSE
+            self.set_message(True, ERROR_MSG.NOT_FOUND_RESPONSE)
+
         if self.IsError:
             self.save_bet_messages(self.betErrorObject)
             return
@@ -356,14 +353,14 @@ class DiamondEightBetbruhSite(BaseSite):
         self.scrape_process.nextPage()
         self.page_response = self.scrape_process.getPage()
         if self.page_response is None:
-            self.IsError = True
-            self.ErrorMsg = ERROR_MSG.NOT_FOUND_RESPONSE
+            self.set_message(True, ERROR_MSG.NOT_FOUND_RESPONSE)
+
         elif self.page_response.url == '{}/client/bet-the-board.aspx?error=toomuchtotal'.format(self.siteLink):
-            self.IsError = True
-            self.ErrorMsg = ERROR_MSG.INSUFFICIENT_BALANCE
+            self.set_message(True, ERROR_MSG.INSUFFICIENT_BALANCE)
+
         elif self.page_response.url == '{}/client/bet-the-board.aspx?error=toolittlesingle'.format(self.siteLink):
-            self.IsError = True
-            self.ErrorMsg = ERROR_MSG.MINIMUM_WAGER_LIMIT
+            self.set_message(True, ERROR_MSG.MINIMUM_WAGER_LIMIT)
+
         if self.IsError:
             self.save_bet_messages(self.betErrorObject)
             return
@@ -372,14 +369,12 @@ class DiamondEightBetbruhSite(BaseSite):
         self.scrape_process.nextPage()
         self.page_response = self.scrape_process.getPage()
         if self.page_response is None:
-            self.IsError = True
-            self.ErrorMsg = ERROR_MSG.NOT_FOUND_RESPONSE
+            self.set_message(True, ERROR_MSG.NOT_FOUND_RESPONSE)
 
         if self.IsError:
             self.save_bet_messages(self.betErrorObject)
             return
         else:
-            self.IsError = False
-            self.ErrorMsg = ERROR_MSG.BET_PLACED
+            self.set_message(False, ERROR_MSG.BET_PLACED)
             self.save_bet_messages(self.betErrorObject)
 
