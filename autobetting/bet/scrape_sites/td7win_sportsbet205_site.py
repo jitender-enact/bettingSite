@@ -7,6 +7,7 @@ from users.core import constants as ERROR_MSG
 from bs4 import BeautifulSoup
 from requests.exceptions import HTTPError, TooManyRedirects, Timeout, RequestException
 
+
 class SportsbetTdseven(BaseSite):
     """
     Class handle the crawling of Ocbet.ag, Vegassb.com, Betevo.com and Lovesaigon.com sites.
@@ -165,10 +166,12 @@ class SportsbetTdseven(BaseSite):
             form = soup.find("form", attrs={'name': 'SportSelectionForm'})
             select_game = form.find("input", attrs={'name': 'lg30'})
             if select_game:
-                self.scrape_process.SITE_PAGES['page_5']["post_data"] = [(select_game['name'], select_game['value']),]
+                self.scrape_process.SITE_PAGES['page_5']["post_data"] = [(select_game['name'], select_game['value']), ]
             else:
                 # game not found
                 self.set_message(True, ERROR_MSG.GAME_NOT_FOUND)
+        else:
+            self.set_message(True, ERROR_MSG.DOM_STRUCTURE_CHANGED, valid_dict['msg'])
 
     def _validate_apply_bet_page(self, soup_dom_object):
         """
@@ -180,7 +183,21 @@ class SportsbetTdseven(BaseSite):
         :return return_data: Dictionary
         """
         return_data = {"valid": True, "msg": ""}  # set the `True` value of `return_data` variable.
-        pass
+        form = soup_dom_object.find("form", attrs={"name": "lf"})
+        if not form:
+            return_data.update({"valid": False, "msg": "Not found form[name=lf]"})
+        else:
+            table = form.find("table", attrs={"class": "table_lines"})
+            if not table:
+                return_data.update({"valid": False, "msg": "Not found table[class=table_lines] "
+                                                           "(form[name=lf] > table[class=table_lines])"})
+            elif not table.find("td", attrs={"class": "trGameTime"}):
+                return_data.update({"valid": False, "msg": "Not found td[class=trGameTime] (form[name=lf] > "
+                                                           "table[class=table_lines] > td[class=trGameTime])"})
+            elif not table.find("tr", attrs={"class": "trGameTime"}):
+                return_data.update({"valid": False, "msg": "Not found tr[class=trGameTime] (form[name=lf] > "
+                                                           "table[class=table_lines] > td[class=trGameTime] > "
+                                                           "tr[class=trGameTime])"})
         return return_data
 
     def apply_bet(self):
@@ -193,68 +210,96 @@ class SportsbetTdseven(BaseSite):
 
         # create instance of the BeautifulSoup
         soup = BeautifulSoup(self.page_response.text, 'lxml')
+        return_data = self._validate_apply_bet_page(soup)
+
+        # check the DOM structure
+        if not return_data['valid']:
+            self.set_message(True, ERROR_MSG.DOM_STRUCTURE_CHANGED, return_data['msg'])
+            return
 
         post_data = {}  # initialize post_data as dict
         incomingLineRS = -1000000000000000  # set default incoming Line
         incomingJuiceRS = -1000000000000000  # set default incoming Juice
 
         # set the all hidden and other input and select element  values in `post_data`
-        form = soup.find("form", attrs={"name": "GameSelectionForm"})
-        table = form.find("table", attrs={"class": "lines-offering"})
+        form = soup.find("form", attrs={"name": "lf"})
+        table = form.find("table", attrs={"class": "table_lines"})
 
         for input_ele in form.find_all("input", attrs={"type": "hidden"}):
             post_data.update({input_ele['name']: input_ele['value'] if input_ele.has_attr('value') else ""})
 
-        date = "{date:%a} {date.month}/{date.day}".format(date=self.ModelObject.bet_date)
+        for input_ele in form.find_all("input", attrs={"type": "text"}):
+            post_data.update({input_ele['name']: input_ele['value'] if input_ele.has_attr('value') else ""})
+
+        for select_ele in form.find_all("select"):
+            option = select_ele.find('option', attrs={'selected': True})
+            if option:
+                post_data.update({select_ele['name']: option['value'] if option.has_attr('value') else "0"})
+
+        date = "{date:%a} {date:%m}/{date.%d}".format(date=self.ModelObject.bet_date)
 
         game_element = None
 
+        bet_date_games = []
+
         for row in table.find_all("tr"):
-            if row.find("td") and row.find("td").get_text(strip=True) == date:
+            tr = row.find("tr", attrs={"class": "trGameTime"})
+            td = tr.findChild('td') if tr else None
+            if td and date in td.get_text():
 
-                tds = row.find_all("td")
+                # getting the next sibling element
+                sibling = row.find_next_sibling("tr")
 
-                # td [1] for getting the rotation value
-                rotation_td = tds[1].get_text(strip=True) if tds and len(tds) > 0 else None
+                # getting the rotation element
+                rot = sibling.find("div", attrs={"class": "rot"}) \
+                    if sibling and sibling.find("div", attrs={"class": "rot"}) else None
 
-                if int(rotation_td) == self.ModelObject.rotation:
-                    game_element = row
+                game_element = sibling if rot and \
+                                          rot.get_text(strip=True) == "{}".format(self.ModelObject.rotation) else None
+
+                if not game_element and sibling.find_next_sibling("tr"):
+
+                    # getting the next to next sibling element
+                    next_sibling = sibling.find_next_sibling("tr")
+
+                    # getting the rotation element
+                    rot = next_sibling.find("div", attrs={"class": "rot"}) \
+                        if next_sibling and next_sibling.find("div", attrs={"class": "rot"}) else None
+
+                    game_element = next_sibling if rot and \
+                                                   rot.get_text(strip=True) == "{}".format(
+                        self.ModelObject.rotation) else None
+
+                # if found the table row then break the loop
+                if game_element:
                     break
 
-                sibling = row.find_next_sibling("tr")
-                if sibling and (not sibling.has_attr("colspan")):
-                    tds = row.find_all("td")
-
-                    # td [1] for getting the rotation value
-                    rotation_td = tds[1].get_text(strip=True) if tds and len(tds) > 0 else None
-
-                    if int(rotation_td) == self.ModelObject.rotation:
-                        game_element = row
-                        break
         if game_element:
             tds = game_element.find_all("td")
 
             # td[5] = Spread Line, td[6] = Money Line, td[7] = Total Point, td[8] = Team total point
             selected_lines = {value: key for key, value in SELECTED_LINES}
-            selected_line_index = {selected_lines["SPREAD"]: 5,
-                                   selected_lines["TOTAL"]: 7,
-                                   selected_lines['MONEY LINE']: 6,
-                                   selected_lines["TEAM TOTAL"]: 8}
+            selected_line_index = {selected_lines["SPREAD"]: 1,
+                                   selected_lines["TOTAL"]: 3,
+                                   selected_lines['MONEY LINE']: 5,
+                                   selected_lines["TEAM TOTAL"]: 7}
 
-            index = selected_line_index[self.ModelObject.selected_line] if self.ModelObject.selected_line \
-                                                                           in selected_line_index else None
+            index = selected_line_index[self.ModelObject.selected_line] \
+                if self.ModelObject.selected_line in selected_line_index else None
 
             if not index is None:
                 element = tds[index]
-                input_ele = element.find("input", attrs={'type': 'text'})
+                input_ele = element.findChild("input", attrs={'type': 'text'})
+                lable_ele = element.findChild("label")
                 if input_ele:
-                    context = element.get_text(strip=True)
+                    context = lable_ele.get_text(strip=True)
                     context = context.replace(u'\xa0', " ")
+                    context = context.replace("ov", "+")
+                    context = context.replace("un", "-")
                     context_list = context.split(" ")
 
                     post_data.update({input_ele['name']: '{0:.2f}'.format(self.ModelObject.amount)})
 
-                    total_point = ["Over", "Under"]
                     for key, val in enumerate(context_list):
                         if val == "":
                             continue
@@ -265,11 +310,6 @@ class SportsbetTdseven(BaseSite):
                                 incomingJuiceRS = int(context_list[key - 1]) + fraction
                             else:
                                 incomingLineRS = int(context_list[key - 1]) + fraction
-                        elif val in total_point:
-                            if val == "Over":
-                                context_list[key + 1] = -1 * int(context_list[key + 1])
-                            else:
-                                context_list[key] = int(context_list[key])
                         elif self.ModelObject.selected_line == selected_lines['MONEY LINE']:
                             incomingLineRS = 0
                             if incomingJuiceRS == -1000000000000000:
@@ -354,33 +394,33 @@ class SportsbetTdseven(BaseSite):
     #     self.scrape_process.nextPage()
     #     self.page_response = self.scrape_process.getPage()
     #     print(self.page_response)
-        # if self.page_response is None:
-        #     self.IsError = True
-        #     self.ErrorMsg = ERROR_MSG.NOT_FOUND_RESPONSE
-        # elif self.page_response.url == '{}/client/bet-the-board.aspx?error=toomuchtotal'.format(self.siteLink):
-        #     self.IsError = True
-        #     self.ErrorMsg = ERROR_MSG.INSUFFICIENT_BALANCE
-        # elif self.page_response.url == '{}/client/bet-the-board.aspx?error=toolittlesingle'.format(self.siteLink):
-        #     self.IsError = True
-        #     self.ErrorMsg = ERROR_MSG.MINIMUM_WAGER_LIMIT
-        # if self.IsError:
-        #     self.save_bet_messages(self.betErrorObject)
-        #     return
-        #
-        # self.submitBet()
-        # self.scrape_process.nextPage()
-        # self.page_response = self.scrape_process.getPage()
-        # if self.page_response is None:
-        #     self.IsError = True
-        #     self.ErrorMsg = ERROR_MSG.NOT_FOUND_RESPONSE
-        #
-        # if self.IsError:
-        #     self.save_bet_messages(self.betErrorObject)
-        #     return
-        # else:
-        #     self.IsError = False
-        #     self.ErrorMsg = ERROR_MSG.BET_PLACED
-        #     self.save_bet_messages(self.betErrorObject)
+    # if self.page_response is None:
+    #     self.IsError = True
+    #     self.ErrorMsg = ERROR_MSG.NOT_FOUND_RESPONSE
+    # elif self.page_response.url == '{}/client/bet-the-board.aspx?error=toomuchtotal'.format(self.siteLink):
+    #     self.IsError = True
+    #     self.ErrorMsg = ERROR_MSG.INSUFFICIENT_BALANCE
+    # elif self.page_response.url == '{}/client/bet-the-board.aspx?error=toolittlesingle'.format(self.siteLink):
+    #     self.IsError = True
+    #     self.ErrorMsg = ERROR_MSG.MINIMUM_WAGER_LIMIT
+    # if self.IsError:
+    #     self.save_bet_messages(self.betErrorObject)
+    #     return
+    #
+    # self.submitBet()
+    # self.scrape_process.nextPage()
+    # self.page_response = self.scrape_process.getPage()
+    # if self.page_response is None:
+    #     self.IsError = True
+    #     self.ErrorMsg = ERROR_MSG.NOT_FOUND_RESPONSE
+    #
+    # if self.IsError:
+    #     self.save_bet_messages(self.betErrorObject)
+    #     return
+    # else:
+    #     self.IsError = False
+    #     self.ErrorMsg = ERROR_MSG.BET_PLACED
+    #     self.save_bet_messages(self.betErrorObject)
 
 
 class TdsevenwinSite(SportsbetTdseven):
@@ -389,7 +429,8 @@ class TdsevenwinSite(SportsbetTdseven):
         try:
             game_types = self.GAME_TYPES
             game_interval = {key: value for key, value in GAME_INTERVALS}
-            self.initial_validation(game_interval[self.ModelObject.game_interval], game_types[self.ModelObject.game_type])
+            self.initial_validation(game_interval[self.ModelObject.game_interval],
+                                    game_types[self.ModelObject.game_type])
             if self.IsError:
                 self.save_bet_messages(self.betErrorObject)
                 return
@@ -445,4 +486,3 @@ class TdsevenwinSite(SportsbetTdseven):
             print("OOps: Something Else", err)
         except Exception as err:
             print("Interval server error", err)
-
