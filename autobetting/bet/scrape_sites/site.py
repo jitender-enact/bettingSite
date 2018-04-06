@@ -8,7 +8,7 @@ ERROR_STATUS = {value: key for key, value in BET_ERROR_STATUS}
 
 class BaseSite:
     IsError = False
-    ErrorMsg = None
+    ErrorMsg = {}
     AcceptedGameType = []
     AcceptedGameIntervals = []
     AcceptedGameCombination = {}
@@ -34,14 +34,14 @@ class BaseSite:
             elif not (game_interval in self.AcceptedGameCombination[game_type]):
                 self.set_message(True, ERROR_MSG.INVALID_INTERVAL_SELECTED)
 
-    def set_message(self, is_error, message):
+    def set_message(self, is_error, message, site_message=None):
         """
         Set the `IsError` and `ErrorMsg`
         :param is_error:  True or False (Boolean)
         :param message:  message (string)
         """
         self.IsError = is_error
-        self.ErrorMsg = message
+        self.ErrorMsg = {"message": message, "site_message": None}
 
     def save_bet_messages(self, berErrorObj):
         """
@@ -51,6 +51,7 @@ class BaseSite:
         """
         status = ERROR_STATUS["error" if self.IsError else "success"]
         berErrorObj.status = status
-        berErrorObj.message = self.ErrorMsg
+        berErrorObj.message = self.ErrorMsg["message"]
+        berErrorObj.site_message = self.ErrorMsg["site_message"]
         berErrorObj.save()
         return berErrorObj
