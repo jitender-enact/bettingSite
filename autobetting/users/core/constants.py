@@ -29,7 +29,7 @@ INVALID_GAME_TYPE_SELECTED = "Invalid game selected."
 
 BET_PLACED = "Bet placed"
 
-
+DOM_STRUCTURE_CHANGED = "Error: DOM structure changed."
 
 # REQUEST ERRORS
 TIMEOUT_ERROR = "HTTP Error 408 - Request Timeout"
