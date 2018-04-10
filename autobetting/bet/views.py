@@ -2,14 +2,17 @@ from django.shortcuts import render, HttpResponseRedirect
 from django.views import generic
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.conf import settings
 from users.core import constants as MSG
-from bet.forms import UserBetForm, UserSiteCredentialsFrom
-from bet.models import UserBets, BetErrors, UserSiteCredentials, Sites, BET_ERROR_STATUS
+from bet.forms import UserBetForm, UserSiteCredentialsFrom, UserPreferencesForm
+from bet.models import UserBets, BetErrors, UserSiteCredentials, UserPreferences, Sites, BET_ERROR_STATUS
 
 from bet.scrape_sites.diamond_eight_betbruh_site import DiamondEightBetbruhSite
+
+
 # Create your views here.
 
 
@@ -72,15 +75,35 @@ class CreateBetView(generic.FormView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        """Insert the form into the context dict."""
+        kwargs = super().get_context_data(**kwargs)
+        preference = UserPreferences.objects.filter(user__id=self.request.user.id).first()
+        form = UserPreferencesForm()
+        if preference:
+            form = UserPreferencesForm(instance=preference)
+        kwargs['preference_form'] = form
+        return kwargs
+
+    def get_initial(self):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        initial = super(CreateBetView, self).get_initial()
+        if hasattr(self.request.user, 'user_preferences') and self.request.user.user_preferences is not None:
+            initial['game_type'] = self.request.user.user_preferences.game_type
+            initial['game_interval'] = self.request.user.user_preferences.game_interval
+            initial['selected_line'] = self.request.user.user_preferences.selected_line
+
+        return initial
+
     def get(self, request, *args, **kwargs):
-        form = super(CreateBetView, self).get_form()
+        # form = super(CreateBetView, self).get_form()
         # Set initial values and custom widget
-        initial_base = self.get_initial()
-        form.initial = initial_base
+        # print(form)
         # return response using standard render() method
         return render(request, self.template_name,
-                      {'form': form,
-                       'special_context_variable': 'My special context variable!!!'})
+                      self.get_context_data())
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -119,7 +142,6 @@ class CreateBetView(generic.FormView):
 
         if credentials:
             for credential in credentials:
-
                 # create BetErrors Object with with status=1
                 betErrors = BetErrors.objects.create(**{
                     "bet_id": betObject.id,
@@ -138,6 +160,7 @@ class CreateBetView(generic.FormView):
         :param betErrors:
         :return:
         """
+
         def site_crawling(betObject, credentials, betErrors):
             """
             start the crawling of site
@@ -151,7 +174,6 @@ class CreateBetView(generic.FormView):
 
         import threading
         if credentials.site.site_name.upper() in ["DIAMONDSB", "EIGHTPLAYS", "BETBRUH"]:
-
             # initialize thread
             t = threading.Thread(target=site_crawling, args=(betObject, credentials, betErrors), kwargs={})
             t.setDaemon(True)  # set thread in bg
@@ -225,3 +247,26 @@ class CreateUserCredentialsView(generic.FormView):
         self.object = None
         # Return class-based view form_invalid to generate form with errors
         return self.form_invalid(form)
+
+
+class CreateUserPreferenceView(generic.View):
+    """
+    View handle and show the dash-board
+    """
+    form_class = UserPreferencesForm
+    redirect_to = reverse_lazy('bet:create_bet_page')
+
+    @method_decorator(login_required(login_url=reverse_lazy('users:login')))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        redirect_link = request.POST.get("redirect_link", None)
+        redirect_link = redirect_link if redirect_link else self.redirect_to
+        # Verify form is valid
+        if form.is_valid():
+            preference = form.save(request)
+            # Add custom success message
+            messages.success(request, MSG.PREFERENCES_SAVED)
+        return HttpResponseRedirect(redirect_link)

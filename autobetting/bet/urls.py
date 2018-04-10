@@ -17,4 +17,7 @@ urlpatterns = [
     path('site-credential-list/',
          views.ListUserCredentialsView.as_view(),
          name="list_credentials_page"),
+    path('create-preference/',
+         views.CreateUserPreferenceView.as_view(),
+         name="create_preference_page"),
 ]
