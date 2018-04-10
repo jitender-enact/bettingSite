@@ -95,3 +95,16 @@ class BetErrors(models.Model):
 
     def __str__(self):
         return 'Bet message: {}'.format(self.message)
+
+
+class UserPreferences(models.Model):
+    user = models.OneToOneField(User, on_delete=models.DO_NOTHING, null=True, blank=True,
+                                related_name="user_preferences")
+    game_type = models.IntegerField(default=0, verbose_name="Type of sport")
+    game_interval = models.IntegerField(default=0, verbose_name="Game interval")
+    selected_line = models.IntegerField(default=0, verbose_name="Bet type")
+    created = models.DateTimeField(null=True, auto_now_add=True)
+    modified = models.DateTimeField(null=True, auto_now=True)
+
+    def __str__(self):
+        return '{}'.format(self.pk)
