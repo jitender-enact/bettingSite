@@ -10,6 +10,7 @@ MSG_CHANGE_PASSWORD_SUCCESS = "Your password has been updated successfully."
 
 BET_SAVED = "Betting on all sites. Check betting status on Bet Status Page."
 CREDENTIALS_SAVED = "Credentials of sites has been saved."
+PREFERENCES_SAVED = "Defaults values has been saved"
 
 
 # CRAWLING ERROR MSG
