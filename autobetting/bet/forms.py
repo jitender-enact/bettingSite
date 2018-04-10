@@ -1,5 +1,5 @@
 from django import forms
-from bet.models import UserBets, UserSiteCredentials, Sites, GAME_INTERVALS, GAME_TYPES,  SELECTED_LINES
+from bet.models import UserBets, UserSiteCredentials, Sites, UserPreferences, GAME_INTERVALS, GAME_TYPES,  SELECTED_LINES
 from users.forms import WidgetAttributesMixin
 from django.utils import timezone
 import datetime
@@ -130,4 +130,59 @@ class UserSiteCredentialsFrom(WidgetAttributesMixin, forms.ModelForm):
                 self.instance = instance
                 self.instance.username = self.cleaned_data["username"]
                 self.instance.password = self.cleaned_data["password"]
+        return super().save()
+
+
+class UserPreferencesForm(WidgetAttributesMixin, forms.ModelForm):
+    """
+    UserBetForm used for creating and validating the UserBet
+    """
+    class Meta:
+        model = UserPreferences
+        exclude = ['user', 'created', 'modified']
+
+    def __init__(self, *args, **kwargs):
+        """
+        Applied some css class and placeholders into the all
+         fields of the UserBetForm form.
+        """
+        super().__init__(*args, **kwargs)
+        game_types = [(0, "----")]
+        game_types.extend([(key, val) for key,val in GAME_TYPES])
+        game_intervales = [(0, "----")]
+        game_intervales.extend([(key, val) for key,val in GAME_INTERVALS])
+        selected_lines = [(0, "----")]
+        selected_lines.extend([(key, val) for key, val in SELECTED_LINES])
+
+        self.fields['game_type'] = forms.ChoiceField(choices=game_types, widget=forms.Select)
+        self.fields['game_interval'] = forms.ChoiceField(choices=game_intervales, widget=forms.Select)
+        self.fields['selected_line'] = forms.ChoiceField(choices=selected_lines, widget=forms.Select)
+
+        self.update_the_widget_attr('game_type', {
+            'class': 'form-control',
+            'placeholder': 'Select Option',
+        })
+        self.update_the_widget_attr('game_interval', {
+            'class': 'form-control',
+            'placeholder': 'Select Option',
+        })
+        self.update_the_widget_attr('selected_line', {
+            'class': 'form-control',
+            'placeholder': 'Select Option',
+        })
+
+
+    def save(self, request):
+        """
+        Overwrite the save method and set the user before saving the UserBets instance
+        :param request:
+        :return UserBets instance:
+        """
+        self.instance.user = request.user
+        instance = UserPreferences.objects.filter(user__id=request.user.id).first()
+        if instance:
+            self.instance = instance
+            self.instance.game_type = int(self.cleaned_data["game_type"])
+            self.instance.game_interval = int(self.cleaned_data["game_interval"])
+            self.instance.selected_line = int(self.cleaned_data["selected_line"])
         return super().save()
