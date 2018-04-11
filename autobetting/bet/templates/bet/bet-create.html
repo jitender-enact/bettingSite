@@ -1,5 +1,6 @@
 {% extends "users/layout/base.html" %}
 {% load staticfiles %}
+{% load custom_tags %}
 
 {% block css_header %}
     {{ block.super }}
@@ -80,16 +81,27 @@
                           action="{% url 'bet:create_bet_page' %}"
                           data-toggle="validator">
                         {% csrf_token %}
-                        {% if form.non_field_errors %}
-                            <p class="bg-danger ele-font-size text-center text-danger element-pedding">{{ form.non_field_errors.as_text }}</p>
+                        {{ form.is_default_amount }}
+
+                        {% if form.errors %}
+                            <div class="bg-danger ele-font-size text-center text-danger element-pedding">
+                                {% for field in form %}
+                                    {% if field.errors %}
+                                        <p>{{ field.name }}: {{ field.errors.as_text }}</p>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if form.non_field_errors %}
+                                    <p>{{ form.non_field_errors.as_text }}</p>
+                                {% endif %}
+                            </div>
                         {% endif %}
                         <div class="form-group ">
                             <div class="col-sm-6">
                                 {{ form.game_name }}
                                 {% if form.game_name.errors %}
-                                    <div class="with-errors text-danger">{{ form.game_name.errors.as_text }}</div>
+                                    <div class="help-block with-errors text-danger">{{ form.game_name.errors.as_text }}</div>
                                 {% else %}
-                                    <div class="with-errors text-danger"></div>
+                                    <div class="help-block with-errors text-danger"></div>
                                 {% endif %}
                             </div>
                         </div>
@@ -97,17 +109,17 @@
                             <div class="col-sm-12">
                                 <div class="btn-group btn-group-sm tabs" data-toggle="buttons">
                                     {% for choice in form.game_type %}
-                                        <label for="{{ choice.id_for_label }}" class="btn btn-default
-                                                {% ifequal choice.data.value  form.game_type.initial %} active{% endifequal %}">
+                                        <label for="{{ choice.id_for_label }}" class="game-type-label btn btn-default
+                                                {% add_active_class choice.data.value form.game_type.data form.game_type.initial %}">
                                             {{ choice.tag }}
                                             {{ choice.choice_label }}
                                         </label>
                                     {% endfor %}
-                                    {#                                    {% if form.game_type %}#}
-                                    {#                                        <div class="with-errors text-danger">{{ form.form.game_type.errors.as_text }}</div>#}
-                                    {#                                    {% else %}#}
-                                    {#                                        <div class="with-errors text-danger"></div>#}
-                                    {#                                    {% endif %}#}
+{#                                    {% if form.game_type %}#}
+{#                                        <div class="help-block with-errors text-danger">{{ form.form.game_type.errors.as_text }}</div>#}
+{#                                    {% else %}#}
+{#                                        <div class="help-block with-errors text-danger"></div>#}
+{#                                    {% endif %}#}
                                 </div>
                             </div>
                         </div>
@@ -116,15 +128,15 @@
                                 <div class="btn-group btn-group-sm tabs" data-toggle="buttons">
                                     {% for choice in form.game_interval %}
                                         <label for="{{ choice.id_for_label }}"
-                                               class="btn btn-default {% ifequal choice.data.value  form.game_interval.initial %} active{% endifequal %}">
+                                               class="btn btn-default {% add_active_class choice.data.value form.game_interval.data form.game_interval.initial %}">
                                             {{ choice.tag }}
                                             {{ choice.choice_label }}
                                         </label>
                                     {% endfor %}
                                     {#                                    {% if form.game_interval %}#}
-                                    {#                                        <div class="with-errors text-danger">{{ form.form.game_interval.errors.as_text }}</div>#}
+                                    {#                                        <div class="help-block with-errors text-danger">{{ form.form.game_interval.errors.as_text }}</div>#}
                                     {#                                    {% else %}#}
-                                    {#                                        <div class="with-errors text-danger"></div>#}
+                                    {#                                        <div class="help-block with-errors text-danger"></div>#}
                                     {#                                    {% endif %}#}
                                 </div>
                                 <span>(QTRs for CFB, NFL, NBA only)</span>
@@ -134,9 +146,9 @@
                             <div class="col-sm-6">
                                 {{ form.game_team }}
                                 {% if form.game_team.errors %}
-                                    <div class="with-errors text-danger">{{ form.game_team.errors.as_text }}</div>
+                                    <div class="help-block with-errors text-danger">{{ form.game_team.errors.as_text }}</div>
                                 {% else %}
-                                    <div class="with-errors text-danger"></div>
+                                    <div class="help-block with-errors text-danger"></div>
                                 {% endif %}
                             </div>
                         </div>
@@ -144,9 +156,9 @@
                             <div class="col-sm-6">
                                 {{ form.rotation }}
                                 {% if form.rotation.errors %}
-                                    <div class="with-errors text-danger">{{ form.rotation.errors.as_text }}</div>
+                                    <div class="help-block with-errors text-danger" >{{ form.rotation.errors.as_text }}</div>
                                 {% else %}
-                                    <div class="with-errors text-danger"></div>
+                                    <div class="help-block with-errors text-danger"></div>
                                 {% endif %}
                             </div>
                         </div>
@@ -161,9 +173,9 @@
                                         </label>
                                     {% endfor %}
                                     {#                                    {% if form.bet_date %}#}
-                                    {#                                        <div class="with-errors text-danger">{{ form.form.bet_date.errors.as_text }}</div>#}
+                                    {#                                        <div class="help-block with-errors text-danger">{{ form.form.bet_date.errors.as_text }}</div>#}
                                     {#                                    {% else %}#}
-                                    {#                                        <div class="with-errors text-danger"></div>#}
+                                    {#                                        <div class="help-block with-errors text-danger"></div>#}
                                     {#                                    {% endif %}#}
                                 </div>
                             </div>
@@ -174,15 +186,15 @@
                                 <div class="btn-group btn-group-sm tabs" data-toggle="buttons">
                                     {% for choice in form.selected_line %}
                                         <label for="{{ choice.id_for_label }}"
-                                               class="btn btn-default {% ifequal choice.data.value  form.selected_line.initial %} active{% endifequal %}">
+                                               class="selected-line-label btn btn-default {% add_active_class choice.data.value form.selected_line.data form.selected_line.initial %}">
                                             {{ choice.tag }}
                                             {{ choice.choice_label }}
                                         </label>
                                     {% endfor %}
                                     {#                                    {% if form.selected_line %}#}
-                                    {#                                        <div class="with-errors text-danger">{{ form.form.selected_line.errors.as_text }}</div>#}
+                                    {#                                        <div class="help-block with-errors text-danger">{{ form.form.selected_line.errors.as_text }}</div>#}
                                     {#                                    {% else %}#}
-                                    {#                                        <div class="with-errors text-danger"></div>#}
+                                    {#                                        <div class="help-block with-errors text-danger"></div>#}
                                     {#                                    {% endif %}#}
                                 </div>
                             </div>
@@ -192,9 +204,9 @@
                             <div class="col-sm-6">
                                 {{ form.incoming_line }}
                                 {% if form.incoming_line.errors %}
-                                    <div class="with-errors text-danger">{{ form.incoming_line.errors.as_text }}</div>
+                                    <div class="help-block with-errors text-danger">{{ form.incoming_line.errors.as_text }}</div>
                                 {% else %}
-                                    <div class="with-errors text-danger"></div>
+                                    <div class="help-block with-errors text-danger"></div>
                                 {% endif %}
                             </div>
                         </div>
@@ -202,9 +214,9 @@
                             <div class="col-sm-6">
                                 {{ form.incoming_juice }}
                                 {% if form.incoming_juice.errors %}
-                                    <div class="with-errors text-danger">{{ form.incoming_juice.errors.as_text }}</div>
+                                    <div class="help-block with-errors text-danger">{{ form.incoming_juice.errors.as_text }}</div>
                                 {% else %}
-                                    <div class="with-errors text-danger"></div>
+                                    <div class="help-block with-errors text-danger"></div>
                                 {% endif %}
                             </div>
                         </div>
@@ -212,16 +224,16 @@
                             <div class="col-sm-6">
                                 {{ form.amount }}
                                 {% if form.amount.errors %}
-                                    <div class="with-errors text-danger">{{ form.amount.errors.as_text }}</div>
+                                    <div class="help-block with-errors text-danger">{{ form.amount.errors.as_text }}</div>
                                 {% else %}
-                                    <div class="with-errors text-danger"></div>
+                                    <div class="help-block with-errors text-danger"></div>
                                 {% endif %}
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-md-6">
                                 <div class="pull-left">
-                                    <button id="previewbet" name="Preview" class="btn btn-primary" type="button">
+                                    <button id="previewbet" name="Preview" class="btn btn-primary" type="submit">
                                         Preview
                                     </button>
                                     <button id="clearbet" name="Clear" class="btn btn-info" type="button">Clear</button>
@@ -246,177 +258,7 @@
             </div>
         </div>
     </div>
-    {#    <div class="container">#}
-    {#        {% if messages %}#}
-    {#            {% for message in messages %}#}
-    {#                <p class="bg-success ele-font-size text-center text-success element-pedding {% if message.tags %} {{ message.tags }} {% endif %}">#}
-    {#                    {{ message }}#}
-    {#                </p>#}
-    {#            {% endfor %}#}
-    {#        {% endif %}#}
-    {#        <div class="site-index">#}
-    {#            <div class="Wrapper">#}
-    {#                <form class="form-horizontal bet-form"#}
-    {#                      id="betForm"#}
-    {#                      method="post"#}
-    {#                      action="{% url 'bet:create_bet_page' %}"#}
-    {#                      data-toggle="validator">#}
-    {#                    <div class="container">#}
-    {#                                                {{ form }}#}
-    {#                        {% csrf_token %}#}
-    {#                        {% if form.non_field_errors %}#}
-    {#                            <p class="bg-danger ele-font-size text-center text-danger element-pedding">{{ form.non_field_errors.as_text }}</p>#}
-    {#                        {% endif %}#}
-    {#                        <div class="form-group ">#}
-    {#                            <div class="col-sm-6">#}
-    {#                                {{ form.game_name }}#}
-    {#                                {% if form.game_name.errors %}#}
-    {#                                    <div class="with-errors text-danger">{{ form.game_name.errors.as_text }}</div>#}
-    {#                                {% else %}#}
-    {#                                    <div class="with-errors text-danger"></div>#}
-    {#                                {% endif %}#}
-    {#                            </div>#}
-    {#                        </div>#}
-    {#                        <div class="form-group">#}
-    {#                            <div class="col-sm-12">#}
-    {#                                <div class="tabs">#}
-    {#                                    {% for choice in form.game_type %}#}
-    {#                                        <div class="tab">#}
-    {#                                            {{ choice.tag }}#}
-    {#                                            <label for="{{ choice.id_for_label }}">#}
-    {#                                                {{ choice.choice_label }}#}
-    {#                                            </label>#}
-    {#                                        </div>#}
-    {#                                    {% endfor %}#}
-    {#                                    {% if form.game_type %}#}
-    {#                                        <div class="with-errors text-danger">{{ form.form.game_type.errors.as_text }}</div>#}
-    {#                                    {% else %}#}
-    {#                                        <div class="with-errors text-danger"></div>#}
-    {#                                    {% endif %}#}
-    {#                                </div>#}
-    {#                            </div>#}
-    {#                        </div>#}
-    {#                        <div class="form-group">#}
-    {#                            <div class="col-sm-12">#}
-    {#                                <div class="tabs">#}
-    {#                                    {% for choice in form.game_interval %}#}
-    {#                                        <div class="tab">#}
-    {#                                            {{ choice.tag }}#}
-    {#                                            <label for="{{ choice.id_for_label }}">#}
-    {#                                                {{ choice.choice_label }}#}
-    {#                                            </label>#}
-    {#                                        </div>#}
-    {#                                    {% endfor %}#}
-    {#                                    {% if form.game_interval %}#}
-    {#                                        <div class="with-errors text-danger">{{ form.form.game_interval.errors.as_text }}</div>#}
-    {#                                    {% else %}#}
-    {#                                        <div class="with-errors text-danger"></div>#}
-    {#                                    {% endif %}#}
-    {#                                </div>#}
-    {#                            </div>#}
-    {#                        </div>#}
-    {#                        <div class="form-group ">#}
-    {#                            <div class="col-sm-6">#}
-    {#                                {{ form.game_team }}#}
-    {#                                {% if form.game_team.errors %}#}
-    {#                                    <div class="with-errors text-danger">{{ form.game_team.errors.as_text }}</div>#}
-    {#                                {% else %}#}
-    {#                                    <div class="with-errors text-danger"></div>#}
-    {#                                {% endif %}#}
-    {#                            </div>#}
-    {#                        </div>#}
-    {#                        <div class="form-group ">#}
-    {#                            <div class="col-sm-6">#}
-    {#                                {{ form.rotation }}#}
-    {#                                {% if form.rotation.errors %}#}
-    {#                                    <div class="with-errors text-danger">{{ form.rotation.errors.as_text }}</div>#}
-    {#                                {% else %}#}
-    {#                                    <div class="with-errors text-danger"></div>#}
-    {#                                {% endif %}#}
-    {#                            </div>#}
-    {#                        </div>#}
-    {#                        <div class="form-group">#}
-    {#                            <div class="col-sm-12">#}
-    {#                                <div class="tabs">#}
-    {#                                    {% for choice in form.bet_date %}#}
-    {#                                        <div class="tab">#}
-    {#                                            {{ choice.tag }}#}
-    {#                                            <label for="{{ choice.id_for_label }}">#}
-    {#                                                {{ choice.choice_label }}#}
-    {#                                            </label>#}
-    {#                                        </div>#}
-    {#                                    {% endfor %}#}
-    {#                                    {% if form.bet_date %}#}
-    {#                                        <div class="with-errors text-danger">{{ form.form.bet_date.errors.as_text }}</div>#}
-    {#                                    {% else %}#}
-    {#                                        <div class="with-errors text-danger"></div>#}
-    {#                                    {% endif %}#}
-    {#                                </div>#}
-    {#                            </div>#}
-    {#                        </div>#}
-    {##}
-    {#                        <div class="form-group">#}
-    {#                            <div class="col-sm-12">#}
-    {#                                <div class="tabs">#}
-    {#                                    {% for choice in form.selected_line %}#}
-    {#                                        <div class="tab">#}
-    {#                                            {{ choice.tag }}#}
-    {#                                            <label for="{{ choice.id_for_label }}">#}
-    {#                                                {{ choice.choice_label }}#}
-    {#                                            </label>#}
-    {#                                        </div>#}
-    {#                                    {% endfor %}#}
-    {#                                    {% if form.selected_line %}#}
-    {#                                        <div class="with-errors text-danger">{{ form.form.selected_line.errors.as_text }}</div>#}
-    {#                                    {% else %}#}
-    {#                                        <div class="with-errors text-danger"></div>#}
-    {#                                    {% endif %}#}
-    {#                                </div>#}
-    {#                            </div>#}
-    {#                        </div>#}
-    {##}
-    {#                        <div class="form-group ">#}
-    {#                            <div class="col-sm-6">#}
-    {#                                {{ form.incoming_line }}#}
-    {#                                {% if form.incoming_line.errors %}#}
-    {#                                    <div class="with-errors text-danger">{{ form.incoming_line.errors.as_text }}</div>#}
-    {#                                {% else %}#}
-    {#                                    <div class="with-errors text-danger"></div>#}
-    {#                                {% endif %}#}
-    {#                            </div>#}
-    {#                        </div>#}
-    {#                        <div class="form-group ">#}
-    {#                            <div class="col-sm-6">#}
-    {#                                {{ form.incoming_juice }}#}
-    {#                                {% if form.incoming_juice.errors %}#}
-    {#                                    <div class="with-errors text-danger">{{ form.incoming_juice.errors.as_text }}</div>#}
-    {#                                {% else %}#}
-    {#                                    <div class="with-errors text-danger"></div>#}
-    {#                                {% endif %}#}
-    {#                            </div>#}
-    {#                        </div>#}
-    {#                        <div class="form-group ">#}
-    {#                            <div class="col-sm-6">#}
-    {#                                {{ form.amount }}#}
-    {#                                {% if form.amount.errors %}#}
-    {#                                    <div class="with-errors text-danger">{{ form.amount.errors.as_text }}</div>#}
-    {#                                {% else %}#}
-    {#                                    <div class="with-errors text-danger"></div>#}
-    {#                                {% endif %}#}
-    {#                            </div>#}
-    {#                        </div>#}
-    {#                        <div class="form-group">#}
-    {#                            <div class="col-md-5">#}
-    {#                                <!-- <button type="submit" class="btn btn-default preview">Submit</button> -->#}
-    {#                                <button type="submit" class="btn btn-primary preview">Submit</button>#}
-    {#                                <button type="button" class="btn btn-default clear">Clear</button>#}
-    {#                            </div><!-- col-md -->#}
-    {#                        </div>#}
-    {#                    </div>#}
-    {#                </form>#}
-    {#            </div>#}
-    {#        </div>#}
-    {#    </div>#}
+
     {% include 'users/layout/footer.html' %}
     <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -425,5 +267,7 @@
 
 {% block js_footer %}
     {{ block.super }}
+    <script src="{% static 'js/validator.min.js' %}"></script>
     <script src="{% static 'js/betting.js' %}"></script>
+
 {% endblock %}

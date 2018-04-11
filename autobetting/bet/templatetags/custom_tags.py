@@ -64,3 +64,16 @@ def get_error_status(value):
     :return error_status value:
     """
     return display_dict_value(value, BET_ERROR_STATUS_DICT)
+
+
+@register.simple_tag
+def add_active_class(current_value, data_value, initial_value ):
+    """
+    Return the 'active' string
+    :param current_value:
+    :param data_value:
+    :param initial_value:
+    :return:
+    """
+    compare_val = data_value if data_value is not None else initial_value
+    return "active" if int(compare_val) == int(current_value) else ""
