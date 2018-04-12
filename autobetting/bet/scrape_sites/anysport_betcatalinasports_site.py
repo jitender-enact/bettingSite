@@ -13,8 +13,14 @@ class AnysportBetcatalinaSite(BaseSite):
     Class handle the crawling of Ocbet.ag, Vegassb.com, Betevo.com and Lovesaigon.com sites.
     """
     page_response = None
-    AcceptedGameType = ["NBA"]
+    AcceptedGameType = ["NFL", "NCAA", "NBA", "NHL"]
     AcceptedGameIntervals = ["GAME"]
+    AcceptedGameCombination = {
+        "MLB": ["GAME"],
+        # "NCAA": ["GAME"],
+        # "NBA": ["GAME"],
+        "NHL": ["GAME"]
+    }
     IsError = False
     ErrorMsg = None
     SITE_PAGES = {}
@@ -95,10 +101,6 @@ class AnysportBetcatalinaSite(BaseSite):
 
         }
 
-        # update the credentials
-        # self.SITE_PAGES["page_2"]['post_data'] = [('ctl00$MainContent$ctlLogin$_UserName', credentialObject.username),
-        #                                           ('ctl00$MainContent$ctlLogin$_Password', credentialObject.password)]
-
         siteLink = betErrorModelObject.site.site_link.strip()
         siteLink = siteLink if (siteLink[len(siteLink) - 1] != "/") else siteLink[:-1]
         self.siteLink = siteLink
@@ -115,14 +117,13 @@ class AnysportBetcatalinaSite(BaseSite):
         self.ModelObject = betModelObject
         self.credentialObject = credentialObject
         self.betErrorObject = betErrorModelObject
-        self.GAME_TYPES = {}
-        # for key, val in GAME_TYPES:
-        #     if val == "BASKETBALL COLLEGE":
-        #         self.GAME_TYPES.update({key: "NCAA"})
-        #     else:
-        #         self.GAME_TYPES.update({key: val})
+        self.GAME_TYPES = dict(GAME_TYPES)
+        self.GAME_INTERVALS = dict(GAME_INTERVALS)
 
-        self.GAME_INTERVALS = {key: val.replace("QTR", "QUARTER") for key, val in GAME_INTERVALS}
+        self.GAME_NAMES_MAP = {
+            "MLB": {"GAME": "lg_5"},
+            "NHL": {"GAME": "lg_7"}
+        }
 
     def site_login(self):
         """
@@ -158,9 +159,9 @@ class AnysportBetcatalinaSite(BaseSite):
         :return return_data: Dictionary
         """
         return_data = {"valid": True, "msg": ""}  # set the `True` value of `return_data` variable.
-        form = soup_dom_object.find("form", attrs={"name": "SportSelectionForm"})
+        form = soup_dom_object.find("form", attrs={"name": "aspnetForm"})
         if not form:
-            return_data.update({"valid": False, "msg": "Not found form[name=SportSelectionForm]"})
+            return_data.update({"valid": False, "msg": "Not found form[name=aspnetForm]"})
         return return_data
 
     def select_game(self):
@@ -173,12 +174,19 @@ class AnysportBetcatalinaSite(BaseSite):
         """
         soup = BeautifulSoup(self.page_response.text, 'lxml')
         valid_dict = self._validate_select_game_page(soup)
+        post_data = {}
 
         if valid_dict['valid']:
-            form = soup.find("form", attrs={'name': 'SportSelectionForm'})
-            select_game = form.find("input", attrs={'name': 'lg30'})
-            if select_game:
-                self.scrape_process.SITE_PAGES['page_5']["post_data"] = [(select_game['name'], select_game['value']), ]
+            form = soup.find("form", attrs={'name': 'aspnetForm'})
+            for tag in form.find("input", attrs={'type': 'hidden'}):
+                post_data.update({tag['name']: tag['value'] if tag.has_attr('value') else ''})
+
+            # PENDING INPUT VALUE
+
+            game = self.GAME_TYPES[self.ModelObject.game_type]
+            interval = self.GAME_INTERVALS[self.ModelObject.game_interval]
+            if game in self.GAME_NAMES_MAP and interval in self.GAME_NAMES_MAP[game]:
+                pass
             else:
                 # game not found
                 self.set_message(True, ERROR_MSG.GAME_NOT_FOUND)
