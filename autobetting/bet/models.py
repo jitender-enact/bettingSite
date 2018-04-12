@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from users.core.utils import generate_token
 # Create your models here.
 
 
@@ -65,6 +66,7 @@ class UserSiteCredentials(models.Model):
 
 
 class UserBets(models.Model):
+    ticket = models.CharField(default=generate_token, max_length=64, null=False, blank=False)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True, related_name="user_bets")
     game_name = models.CharField(max_length=255, null=True, blank=True,
                                  verbose_name="Name of the game (only for display)")

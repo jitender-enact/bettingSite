@@ -11,7 +11,7 @@ class UserBetForm(WidgetAttributesMixin, forms.ModelForm):
     """
     class Meta:
         model = UserBets
-        exclude = ['user', 'created', 'modified']
+        exclude = ['user', 'ticket', 'created', 'modified']
 
     def __init__(self, *args, **kwargs):
         """
