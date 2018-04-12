@@ -125,7 +125,7 @@
                         </div>
                         <div class="form-group">
                             <div class="col-sm-12">
-                                <div class="btn-group btn-group-sm tabs" data-toggle="buttons">
+                                <div class="btn-group btn-group-sm tabs">
                                     {% for choice in form.game_interval %}
                                         <label for="{{ choice.id_for_label }}"
                                                class="btn btn-default {% add_active_class choice.data.value form.game_interval.data form.game_interval.initial %}">

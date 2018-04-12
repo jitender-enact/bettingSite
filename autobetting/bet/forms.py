@@ -71,6 +71,10 @@ class UserBetForm(WidgetAttributesMixin, forms.ModelForm):
 
         self.fields['game_type'] = forms.ChoiceField(choices=GAME_TYPES, widget=forms.RadioSelect)
         self.fields['game_interval'] = forms.ChoiceField(choices=GAME_INTERVALS, widget=forms.RadioSelect)
+        self.update_the_widget_attr('game_interval', {
+            'class': 'form-control period',
+            'autofocus': False,
+        })
         self.fields['selected_line'] = forms.ChoiceField(choices=SELECTED_LINES, widget=forms.RadioSelect)
 
         current_weeks = (((timezone.now()+datetime.timedelta(days=x)).date(),

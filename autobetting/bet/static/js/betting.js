@@ -9,9 +9,7 @@ function hideShowQTRs(isShow) {
     } else {
         $("input[name=game_interval]").each(function () {
             if (game_interval.indexOf($(this).val()) < 0) {
-                $(this).prop('checked', false);
-                $(this).attr('checked', false);
-                $(this).parent("label").removeClass("active").addClass("hide");
+                $(this).prop('checked', false).attr('checked', false).parent("label").removeClass("active").addClass("hide");
             }
         });
     }
@@ -23,26 +21,23 @@ function disableEnableQTRs(isEnable) {
     var game_interval = ["1", "2", "3"];  // display intervals
     if (isEnable === true) {
         $("input[name=game_interval]").each(function () {
-            $(this).parent("label").removeClass("disabled");
-            $(this).parent("label").attr('disabled', false);
-            $(this).removeClass('disabled');
-            $(this).prop('disabled', false);
-            $(this).attr('disabled', false);
+            $(this).prop('disabled', false).attr('disabled', false).removeClass('disabled').parent("label").removeClass("disabled").attr('disabled', false);
         });
     } else {
         $("input[name=game_interval]").each(function () {
             if (game_interval.indexOf($(this).val()) < 0) {
-                $(this).prop('checked', false);
-                $(this).attr('checked', false);
-                $(this).prop('disabled', true);
-                $(this).attr('disabled', true);
-                $(this).addClass('disabled');
-                $(this).parent("label").removeClass("active").addClass("disabled");
-                $(this).parent("label").attr("disabled", true);
+                $(this).prop({'checked': false, 'disabled': true}).attr({'checked': false, 'disabled': true}).addClass('disabled').parent("label").removeClass("active").addClass("disabled").attr("disabled", true);
             }
         });
     }
 }
+
+$(document).on('click', ".tabs label", function () {
+    if ($(this).children('input').is(":checked")) {
+        $(".tabs label").removeClass('active');
+        $(this).addClass("active")
+    }
+});
 
 $(document).on('click', ".game-type-label", function () {
     var sport_types = ["1", "2", "4"];
