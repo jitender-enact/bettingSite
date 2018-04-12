@@ -6,6 +6,16 @@ from django.template import loader
 from django.core.mail import EmailMultiAlternatives
 from django.utils.crypto import get_random_string
 from django.contrib import messages
+from uuid import uuid4
+
+
+def generate_token():
+    """
+    Generate 32 bit random token
+    :return: token
+    """
+    return uuid4().hex
+
 
 
 def get_user_obj_through_email(email):
