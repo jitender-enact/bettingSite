@@ -66,6 +66,22 @@ class AnysportBetcatalinaSite(BaseSite):
                     'Connection': 'keep-alive',
                 }
             },
+            'page_4': {
+                "method": "post",
+                "url": "{}/wager/CreateSports.aspx?WT=0",
+                "update_headers": {
+                    'Origin': '{}',
+                    'Accept-Encoding': 'gzip, deflate',
+                    'Accept-Language': 'en-US,en;q=0.9',
+                    'Upgrade-Insecure-Requests': '1',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+                    'Cache-Control': 'max-age=0',
+                    'Referer': '{}/wager/CreateSports.aspx?WT=0',
+                    'Connection': 'keep-alive',
+                },
+                "post_data": []
+            },
             # "page_4": {
             #     "method": "post",
             #     "url": "{}/cog/GameSelection.asp?WTID=9&WCATID=1",
@@ -145,7 +161,6 @@ class AnysportBetcatalinaSite(BaseSite):
 
         self.SITE_PAGES["page_2"]['post_data'] = [(key, value) for key, value in post_data.items()]
 
-
         self.scrape_process.nextPage()  # set next page
         self.page_response = self.scrape_process.getPage()  # login to site
 
@@ -181,15 +196,26 @@ class AnysportBetcatalinaSite(BaseSite):
             for tag in form.find("input", attrs={'type': 'hidden'}):
                 post_data.update({tag['name']: tag['value'] if tag.has_attr('value') else ''})
 
-            # PENDING INPUT VALUE
-
             game = self.GAME_TYPES[self.ModelObject.game_type]
             interval = self.GAME_INTERVALS[self.ModelObject.game_interval]
+
             if game in self.GAME_NAMES_MAP and interval in self.GAME_NAMES_MAP[game]:
-                pass
+                all_divs = [div for div in form.find_all("div", attrs={'class': 'dd_contentBottom'})
+                            if div.find("input", attrs={'type': 'submit'})]
+
+                for tag in all_divs:
+                    prev_element = tag.find_previous_sibling("table")
+                    elem = prev_element.find("input", attrs={"name": self.GAME_NAMES_MAP[game][interval]})
+                    submit_elem = tag.find("input", attrs={'type': 'submit'})
+                    if elem:
+                        post_data.update({elem['name']: elem['value'] if elem.has_attr('value') else ""})
+                        post_data.update(
+                            {submit_elem['name']: submit_elem['value'] if submit_elem.has_attr('value') else ""})
+                self.scrape_process.SITE_PAGES['page_4']["post_data"] = [(key, val) for key, val in post_data.items()]
             else:
                 # game not found
                 self.set_message(True, ERROR_MSG.GAME_NOT_FOUND)
+
         else:
             self.set_message(True, ERROR_MSG.DOM_STRUCTURE_CHANGED, valid_dict['msg'])
 
@@ -203,11 +229,15 @@ class AnysportBetcatalinaSite(BaseSite):
         :return return_data: Dictionary
         """
         return_data = {"valid": True, "msg": ""}  # set the `True` value of `return_data` variable.
-        form = soup_dom_object.find("form", attrs={"name": "lf"})
+        form = soup_dom_object.find("form", attrs={"name": "aspnetForm"})
         if not form:
-            return_data.update({"valid": False, "msg": "Not found form[name=lf]"})
+            return_data.update({"valid": False, "msg": "Not found form[name=aspnetForm]"})
         else:
-            table = form.find("table", attrs={"class": "table_lines"})
+            table = None
+            for tb in form.find_all('table'):
+                if tb.find("tr", attrs={'class': 'GameBanner'}):
+                    table = tb
+
             if not table:
                 return_data.update({"valid": False, "msg": "Not found table[class=table_lines] "
                                                            "(form[name=lf] > table[class=table_lines])"})
