@@ -141,6 +141,61 @@ class AnysportBetcatalinaSite(BaseSite):
             "NHL": {"GAME": "lg_7"}
         }
 
+    def _validate_balance_page(self, soup_dom_object):
+        """
+        Validate the DOme Element of account balance page
+        :return:
+        """
+        return_data = {"valid": True, "msg": ""}  # set the `True` value of `return_data` variable.
+        balance = soup_dom_object.find("span", attrs={"id": "ctl00_WagerContent_AccountFigures1_lblCurrentBalance"})
+        available_balance = soup_dom_object.find("span",
+                                                 attrs={"id": "ctl00_WagerContent_AccountFigures1_lblRealAvailBalance"})
+        if not balance:
+            return_data.update({"valid": False,
+                                "msg": "Not found balance "
+                                       "span[id=ctl00_WagerContent_AccountFigures1_lblCurrentBalance]"})
+        elif not available_balance:
+            return_data.update({"valid": False,
+                                "msg": "Not found available_balance span"
+                                       "[id=ctl00_WagerContent_AccountFigures1_lblRealAvailBalance]"})
+        return return_data
+
+    def check_account_balance(self):
+        """
+        Check the account balance of the user
+
+        Firstly its open the SITE["page_1"] using `get` method, For creating the cookies
+        then its login the user
+        """
+        self.page_response = self.scrape_process.getPage()  # get account detail page
+        soup = BeautifulSoup(self.page_response.text, 'lxml')
+
+        valid_dict = self._validate_balance_page(soup)
+
+        if valid_dict['valid']:
+            balance = soup.find("span",
+                                attrs={
+                                    "id": "ctl00_WagerContent_AccountFigures1_lblCurrentBalance"
+                                }).get_text(strip=True)
+            available_balance = soup.find("span",
+                                          attrs={
+                                              "id": "ctl00_WagerContent_AccountFigures1_lblRealAvailBalance"
+                                          }).get_text(strip=True)
+            try:
+
+                balance = int(balance.replace(",", ""))
+                available_balance = int(available_balance.replace(",", ""))
+
+                if available_balance <= 1:
+                    self.set_message(True, ERROR_MSG.NOT_SUFFICAINT_BALANCE)
+
+
+
+            except ValueError:
+                self.set_message(True, ERROR_MSG.DOM_STRUCTURE_CHANGED, "Invalid balance about")
+        else:
+            self.set_message(True, ERROR_MSG.DOM_STRUCTURE_CHANGED, valid_dict['msg'])
+
     def site_login(self):
         """
         Login to the Site.
@@ -239,15 +294,8 @@ class AnysportBetcatalinaSite(BaseSite):
                     table = tb
 
             if not table:
-                return_data.update({"valid": False, "msg": "Not found table[class=table_lines] "
-                                                           "(form[name=lf] > table[class=table_lines])"})
-            elif not table.find("td", attrs={"class": "trGameTime"}):
-                return_data.update({"valid": False, "msg": "Not found td[class=trGameTime] (form[name=lf] > "
-                                                           "table[class=table_lines] > td[class=trGameTime])"})
-            elif not table.find("tr", attrs={"class": "trGameTime"}):
-                return_data.update({"valid": False, "msg": "Not found tr[class=trGameTime] (form[name=lf] > "
-                                                           "table[class=table_lines] > td[class=trGameTime] > "
-                                                           "tr[class=trGameTime])"})
+                return_data.update({"valid": False, "msg": "Not found table that has tr[class=GameBanner]"
+                                                           "(form[name=aspnetForm] > table tr[class=GameBanner])"})
         return return_data
 
     def apply_bet(self):
@@ -272,9 +320,8 @@ class AnysportBetcatalinaSite(BaseSite):
         incomingJuiceRS = -1000000000000000  # set default incoming Juice
 
         # set the all hidden and other input and select element  values in `post_data`
-        form = soup.find("form", attrs={"name": "lf"})
-        table = form.find("table", attrs={"class": "table_lines"})
-
+        form = soup.find("form", attrs={"name": "aspnetForm"})
+        table = None
         for input_ele in form.find_all("input", attrs={"type": "hidden"}):
             post_data.update({input_ele['name']: input_ele['value'] if input_ele.has_attr('value') else ""})
 
@@ -286,89 +333,70 @@ class AnysportBetcatalinaSite(BaseSite):
             if option:
                 post_data.update({select_ele['name']: option['value'] if option.has_attr('value') else "0"})
 
-        date = "{date:%a} {date:%m}/{date.%d}".format(date=self.ModelObject.bet_date)
+        date = "{date:%b} {date.day}".format(date=self.ModelObject.bet_date)
+        for tb in form.find_all('table'):
+            if tb.find("tr", attrs={'class': 'GameBanner'}):
+                table = tb
 
-        game_element = None
+        row_elem = None
 
-        bet_date_games = []
+        for tr in table.find_all('tr'):
+            tds = tr.find_all("td")
 
-        for row in table.find_all("tr"):
-            tr = row.find("tr", attrs={"class": "trGameTime"})
-            td = tr.findChild('td') if tr else None
-            if td and date in td.get_text():
+            date_td = tds[1] if tds and len(tds) >= 1 else None
+            check_date = (date_td.get_text(strip=True) == date) if date_td else False
 
-                # getting the next sibling element
-                sibling = row.find_next_sibling("tr")
+            check_rotation = (tds[2].get_text(strip=True) == self.ModelObject.rotation) if len(tds) >= 2 else False
 
-                # getting the rotation element
-                rot = sibling.find("div", attrs={"class": "rot"}) \
-                    if sibling and sibling.find("div", attrs={"class": "rot"}) else None
-
-                game_element = sibling if rot and \
-                                          rot.get_text(strip=True) == "{}".format(self.ModelObject.rotation) else None
-
-                if not game_element and sibling.find_next_sibling("tr"):
-                    # getting the next to next sibling element
-                    next_sibling = sibling.find_next_sibling("tr")
-
-                    # getting the rotation element
-                    rot = next_sibling.find("div", attrs={"class": "rot"}) \
-                        if next_sibling and next_sibling.find("div", attrs={"class": "rot"}) else None
-
-                    game_element = next_sibling if rot and \
-                                                   rot.get_text(strip=True) == "{}".format(
-                        self.ModelObject.rotation) else None
-
-                # if found the table row then break the loop
-                if game_element:
+            if check_date and check_rotation:
+                row_elem = tr
+                break
+            else:
+                next_sibling = tr.find_next_sibling('tr') if check_date and not check_rotation else None
+                tds = next_sibling.find_all("td") if next_sibling else None
+                check_rotation = (tds[2].get_text(strip=True) == self.ModelObject.rotation) if len(tds) >= 2 else False
+                if check_rotation:
+                    row_elem = tr
                     break
-
-        if game_element:
-            tds = game_element.find_all("td")
-
-            # td[5] = Spread Line, td[6] = Money Line, td[7] = Total Point, td[8] = Team total point
+        if row_elem:
             selected_lines = {value: key for key, value in SELECTED_LINES}
-            selected_line_index = {selected_lines["SPREAD"]: 1,
-                                   selected_lines["TOTAL"]: 3,
-                                   selected_lines['MONEY LINE']: 5,
-                                   selected_lines["TEAM TOTAL"]: 7}
-
+            selected_line_index = {selected_lines["SPREAD"]: 4,
+                                   selected_lines["TOTAL"]: 5,
+                                   selected_lines['MONEY LINE']: 6}
             index = selected_line_index[self.ModelObject.selected_line] \
                 if self.ModelObject.selected_line in selected_line_index else None
 
             if not index is None:
+                tds = row_elem.find_all("td")
                 element = tds[index]
-                input_ele = element.findChild("input", attrs={'type': 'text'})
-                lable_ele = element.findChild("label")
-                if input_ele:
-                    context = lable_ele.get_text(strip=True)
-                    context = context.replace(u'\xa0', " ")
-                    context = context.replace("ov", "+")
-                    context = context.replace("un", "-")
-                    context_list = context.split(" ")
-
-                    post_data.update({input_ele['name']: '{0:.2f}'.format(self.ModelObject.amount)})
+                input_ele = element.findChild("input", attrs={'type': 'checkbox'})
+                if input_ele and input_ele.has_attr("value"):
+                    value = input_ele["value"]
+                    context_list = value.replace("_", " ")
+                    context_list = context_list.split(" ")[-2:]
 
                     for key, val in enumerate(context_list):
                         if val == "":
                             continue
-                        if val in FRACTION_VALUES:
-                            fraction = FRACTION_VALUES[val] if (int(context_list[key - 1]) > 0) \
-                                else -1 * FRACTION_VALUES[val]
-                            if key == (len(context_list) - 1):
-                                incomingJuiceRS = int(context_list[key - 1]) + fraction
-                            else:
-                                incomingLineRS = int(context_list[key - 1]) + fraction
-                        elif self.ModelObject.selected_line == selected_lines['MONEY LINE']:
+                        # if val in FRACTION_VALUES:
+                        #     fraction = FRACTION_VALUES[val] if (int(context_list[key - 1]) > 0) \
+                        #         else -1 * FRACTION_VALUES[val]
+                        #     if key == (len(context_list) - 1):
+                        #         incomingJuiceRS = int(context_list[key - 1]) + fraction
+                        #     else:
+                        #         incomingLineRS = int(context_list[key - 1]) + fraction
+                        if self.ModelObject.selected_line == selected_lines['MONEY LINE']:
                             incomingLineRS = 0
-                            if incomingJuiceRS == -1000000000000000:
+                            if key == (len(context_list) - 1) and incomingJuiceRS == -1000000000000000:
                                 incomingJuiceRS = int(val)
                         else:
                             if key != (len(context_list) - 1) and incomingLineRS == -1000000000000000:
                                 incomingLineRS = int(val)
                             else:
                                 incomingJuiceRS = int(val)
-
+                else:
+                    # doesn't has  values
+                    pass
             if (int(self.ModelObject.incoming_line) <= int(incomingLineRS) and
                     int(self.ModelObject.incoming_juice) <= int(incomingJuiceRS)):
                 post_data.update({'submit1': 'Continue'})

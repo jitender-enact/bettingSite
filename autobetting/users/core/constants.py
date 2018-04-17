@@ -28,6 +28,8 @@ ROTATION_NUMBER_NOT_FOUND = "Rotation No. not found for this date."
 INVALID_INTERVAL_SELECTED = "Invalid selected game interval."
 INVALID_GAME_TYPE_SELECTED = "Invalid game selected."
 
+NOT_SUFFICAINT_BALANCE = "You did not have enough balance"
+
 BET_PLACED = "Bet placed"
 
 DOM_STRUCTURE_CHANGED = "Error: DOM structure changed."
