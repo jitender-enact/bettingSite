@@ -20,6 +20,7 @@ INVALID_CREDENTIALS = "Login Authorisation failed. Please check your credentials
 NO_BET_ENTERED = "You have no entered any bets yet. please try again."
 INSUFFICIENT_BALANCE = "You have placed wagers that exceed your available balance. Please try again."
 MINIMUM_WAGER_LIMIT = "You have placed wagers that are under your minimum wager limit. Please try again."
+MAXIMUM_WAGER_LIMIT = "You have placed wagers that are exceed your maximum wager limit. Please try again."
 
 GAME_NOT_FOUND = "Game Not found."
 PROVIDED_ODDS_NOT_MATCH = "Provided Odds are invalid."
@@ -33,6 +34,7 @@ NOT_SUFFICAINT_BALANCE = "You did not have enough balance"
 BET_PLACED = "Bet placed"
 
 DOM_STRUCTURE_CHANGED = "Error: DOM structure changed."
+LOGIC_FAIL = "logic fail"
 
 # REQUEST ERRORS
 TIMEOUT_ERROR = "HTTP Error 408 - Request Timeout"
