@@ -34,7 +34,8 @@ function disableEnableQTRs(isEnable) {
 
 $(document).on('click', ".tabs label", function () {
     if ($(this).children('input').is(":checked")) {
-        $(".tabs label").removeClass('active');
+        var parent_ele = $(this).parent(".tabs");
+        parent_ele.find("label").removeClass('active');
         $(this).addClass("active")
     }
 });

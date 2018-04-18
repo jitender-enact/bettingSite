@@ -245,6 +245,13 @@ class UserSiteCredentialsFrom(WidgetAttributesMixin, forms.ModelForm):
             'placeholder': 'Password',
         })
 
+        self.fields['default_amount'] = forms.DecimalField(widget=forms.TextInput, required=True)
+        self.update_the_widget_attr('default_amount', {
+            'class': 'form-control',
+            'autofocus': False,
+            'placeholder': 'Default Amount',
+        })
+
         # already_selected = UserSiteCredentials.objects.filter(user__id=self.request.user.id).values("site_id")
         sites = Sites.objects.filter(is_active=True)  # .exclude(id__in=already_selected)
         self.fields['site'] = forms.ModelChoiceField(queryset=sites,

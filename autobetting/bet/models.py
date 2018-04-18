@@ -58,6 +58,7 @@ class UserSiteCredentials(models.Model):
     is_active = models.BooleanField(default=True, verbose_name="Is site credentials active")
     username = models.CharField(max_length=255, null=True, blank=True, verbose_name="Username or Email")
     password = models.CharField(max_length=255, null=True, blank=True, verbose_name="User's pass")
+    default_amount = models.DecimalField(max_digits=11, decimal_places=3, default=0)
     created = models.DateTimeField(null=True, auto_now_add=True)
     modified = models.DateTimeField(null=True, auto_now=True)
 
